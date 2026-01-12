@@ -39,20 +39,26 @@ def read_root():
     return {"status": "ok", "message": "Backend is running"}
 
 # CORS Middleware
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[
+#         "http://localhost:5173",
+#         "http://127.0.0.1:5173",
+#         "https://pharmacymanagmentsystemfrontendt.vercel.app",
+#         "https://pharmacymanagmentsystemfrontendt-3hyp6koc6-shhazys-projects.vercel.app/",
+#     ],
+#     # allow_origin_regex=r"http://.*\.localhost:5173",
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://pharmacymanagmentsystemfrontendt.vercel.app",
-        "https://pharmacymanagmentsystemfrontendt-3hyp6koc6-shhazys-projects.vercel.app/",
-    ],
-    # allow_origin_regex=r"http://.*\.localhost:5173",
+    allow_origins=["*"],  # Allows ALL origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Include all routes
 app.include_router(api_router)
 
