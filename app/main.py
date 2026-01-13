@@ -52,9 +52,16 @@ def read_root():
 #     allow_methods=["*"],
 #     allow_headers=["*"],
 # )
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    origin = request.headers.get("origin")
+    print(f"DEBUG: Request {request.method} {request.url.path} from Origin: {origin}")
+    response = await call_next(request)
+    return response
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows ALL origins
+    allow_origin_regex=r".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
