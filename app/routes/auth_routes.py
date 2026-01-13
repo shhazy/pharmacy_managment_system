@@ -18,7 +18,7 @@ from ..auth import (
 
 router = APIRouter()
 
-@router.post("/auth/login", response_model=Token)
+@router.post("/auth/login/", response_model=Token)
 def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     try:
         if login_data.tenant_id:
