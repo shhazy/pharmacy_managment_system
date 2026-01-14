@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
@@ -119,8 +120,17 @@ def get_product(product_id: int, db: Session = Depends(get_db_with_tenant), user
 def create_product(product: ProductCreate, db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):
     db_product = Product(**product.dict())
     db.add(db_product)
+    db.flush()
+    db_product_id = db_product.id
     db.commit()
-    db.refresh(db_product)
+    # db.refresh(db_product)
+    
+    # Restore tenant search path
+    tenant_schema = db.info.get('tenant_schema')
+    if tenant_schema:
+        db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+
+    db_product = db.query(Product).filter(Product.id == db_product_id).first()
     return db_product
 
 @router.put("/{product_id}", response_model=ProductResponse)
@@ -134,7 +144,14 @@ def update_product(product_id: int, product: ProductUpdate, db: Session = Depend
         setattr(db_product, field, value)
     
     db.commit()
-    db.refresh(db_product)
+    # db.refresh(db_product)
+
+    # Restore tenant search path
+    tenant_schema = db.info.get('tenant_schema')
+    if tenant_schema:
+        db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+
+    db_product = db.query(Product).filter(Product.id == product_id).first()
     return db_product
 
 @router.delete("/{product_id}")

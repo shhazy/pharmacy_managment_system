@@ -6,7 +6,7 @@ from .pharmacy_models import (
     Manufacturer, Category, Product, ProductIngredient, 
     ProductSupplier, ProductHistory, Batch, Supplier
 )
-from .procurement_models import PurchaseOrder, StockTransfer
+from .procurement_models import PurchaseOrder, PurchaseOrderItem, StockTransfer, GRN, GRNItem
 from .sales_models import Patient, Prescription, Invoice, InvoiceItem, SalesReturn
 from .service_models import TemperatureLog, RegulatoryLog, StockAdjustment
 from .inventory_models import (
@@ -33,6 +33,7 @@ __all__ = [
     "Batch",
     "Supplier",
     "PurchaseOrder",
+    "PurchaseOrderItem",
     "StockTransfer",
     "Patient",
     "Prescription",

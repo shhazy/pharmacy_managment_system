@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import text
 
 from ..models import Product, ProductIngredient, ProductSupplier, ProductHistory, Batch, User
 from ..schemas import MedicineCreate
@@ -9,7 +10,28 @@ router = APIRouter()
 
 @router.get("/search")
 def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
-    return db.query(Product).filter(Product.product_name.ilike(f"%{q}%")).all()
+    from sqlalchemy import or_, func
+    results = db.query(Product, func.sum(Batch.current_stock).label("current_stock"))\
+        .outerjoin(Batch)\
+        .filter(
+            or_(
+                Product.product_name.ilike(f"%{q}%"),
+                Product.product_code.ilike(f"%{q}%"),
+                Product.barcode.ilike(f"%{q}%")
+            )
+        )\
+        .group_by(Product.id)\
+        .all()
+    
+    # Map to list of dicts or enhanced objects
+    response = []
+    for product, stock in results:
+        p_dict = product.__dict__.copy()
+        if '_sa_instance_state' in p_dict:
+            del p_dict['_sa_instance_state']
+        p_dict['current_stock'] = stock or 0
+        response.append(p_dict)
+    return response
 
 @router.get("/{id}")
 def get_product_details(id: int, db: Session = Depends(get_db_with_tenant)):
@@ -57,5 +79,15 @@ def add_product(med: MedicineCreate, db: Session = Depends(get_db_with_tenant), 
     # 3. History Log
     db.add(ProductHistory(product_id=new_m.id, user_id=user.id, change_type="CREATE", changes={"action": "Initial Creation"}))
     
-    db.commit(); db.refresh(new_m)
+    db.flush()
+    new_m_id = new_m.id
+    db.commit()
+    # db.refresh(new_m) -- REMOVED per multi-tenant best practice
+    
+    # Restore tenant search path
+    tenant_schema = db.info.get('tenant_schema')
+    if tenant_schema:
+        db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+        
+    new_m = db.query(Product).filter(Product.id == new_m_id).first()
     return new_m

@@ -1,0 +1,813 @@
+Error creating PO: (psycopg2.errors.ForeignKeyViolation) insert or update on table "purchase_order_items" violates foreign key constraint "purchase_order_items_purchase_order_id_fkey"
+DETAIL:  Key (purchase_order_id)=(6) is not present in table "purchase_orders".
+
+[SQL: INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_cost, discount_percent, total_cost) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::FLOAT, p4::FLOAT, p5::FLOAT FROM (VALUES (%(purchase_order_id__0)s, %(product_id__0) ... 509 characters truncated ... en_counter) ORDER BY sen_counter RETURNING purchase_order_items.id, purchase_order_items.id AS id__1]
+[parameters: {'purchase_order_id__0': 6, 'product_id__0': 2, 'total_cost__0': 0.0, 'discount_percent__0': 0.0, 'quantity__0': 10, 'unit_cost__0': 0.0, 'purchase_order_id__1': 6, 'product_id__1': 5, 'total_cost__1': 0.0, 'discount_percent__1': 0.0, 'quantity__1': 10, 'unit_cost__1': 0.0, 'purchase_order_id__2': 6, 'product_id__2': 6, 'total_cost__2': 0.0, 'discount_percent__2': 0.0, 'quantity__2': 10, 'unit_cost__2': 0.0, 'purchase_order_id__3': 6, 'product_id__3': 4, 'total_cost__3': 0.0, 'discount_percent__3': 0.0, 'quantity__3': 10, 'unit_cost__3': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "purchase_order_items" violates foreign key constraint "purchase_order_items_purchase_order_id_fkey"
+DETAIL:  Key (purchase_order_id)=(6) is not present in table "purchase_orders".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 60, in create_po
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1137, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_insertmany_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2121, in _exec_insertmany_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "purchase_order_items" violates foreign key constraint "purchase_order_items_purchase_order_id_fkey"
+DETAIL:  Key (purchase_order_id)=(6) is not present in table "purchase_orders".
+
+[SQL: INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_cost, discount_percent, total_cost) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::FLOAT, p4::FLOAT, p5::FLOAT FROM (VALUES (%(purchase_order_id__0)s, %(product_id__0) ... 509 characters truncated ... en_counter) ORDER BY sen_counter RETURNING purchase_order_items.id, purchase_order_items.id AS id__1]
+[parameters: {'purchase_order_id__0': 6, 'product_id__0': 2, 'total_cost__0': 0.0, 'discount_percent__0': 0.0, 'quantity__0': 10, 'unit_cost__0': 0.0, 'purchase_order_id__1': 6, 'product_id__1': 5, 'total_cost__1': 0.0, 'discount_percent__1': 0.0, 'quantity__1': 10, 'unit_cost__1': 0.0, 'purchase_order_id__2': 6, 'product_id__2': 6, 'total_cost__2': 0.0, 'discount_percent__2': 0.0, 'quantity__2': 10, 'unit_cost__2': 0.0, 'purchase_order_id__3': 6, 'product_id__3': 4, 'total_cost__3': 0.0, 'discount_percent__3': 0.0, 'quantity__3': 10, 'unit_cost__3': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.ForeignKeyViolation) insert or update on table "purchase_order_items" violates foreign key constraint "purchase_order_items_purchase_order_id_fkey"
+DETAIL:  Key (purchase_order_id)=(7) is not present in table "purchase_orders".
+
+[SQL: INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_cost, discount_percent, total_cost) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::FLOAT, p4::FLOAT, p5::FLOAT FROM (VALUES (%(purchase_order_id__0)s, %(product_id__0) ... 509 characters truncated ... en_counter) ORDER BY sen_counter RETURNING purchase_order_items.id, purchase_order_items.id AS id__1]
+[parameters: {'purchase_order_id__0': 7, 'product_id__0': 2, 'total_cost__0': 0.0, 'discount_percent__0': 0.0, 'quantity__0': 10, 'unit_cost__0': 0.0, 'purchase_order_id__1': 7, 'product_id__1': 5, 'total_cost__1': 0.0, 'discount_percent__1': 0.0, 'quantity__1': 10, 'unit_cost__1': 0.0, 'purchase_order_id__2': 7, 'product_id__2': 6, 'total_cost__2': 0.0, 'discount_percent__2': 0.0, 'quantity__2': 10, 'unit_cost__2': 0.0, 'purchase_order_id__3': 7, 'product_id__3': 4, 'total_cost__3': 0.0, 'discount_percent__3': 0.0, 'quantity__3': 10, 'unit_cost__3': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "purchase_order_items" violates foreign key constraint "purchase_order_items_purchase_order_id_fkey"
+DETAIL:  Key (purchase_order_id)=(7) is not present in table "purchase_orders".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 60, in create_po
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1137, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_insertmany_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2121, in _exec_insertmany_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "purchase_order_items" violates foreign key constraint "purchase_order_items_purchase_order_id_fkey"
+DETAIL:  Key (purchase_order_id)=(7) is not present in table "purchase_orders".
+
+[SQL: INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_cost, discount_percent, total_cost) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::FLOAT, p4::FLOAT, p5::FLOAT FROM (VALUES (%(purchase_order_id__0)s, %(product_id__0) ... 509 characters truncated ... en_counter) ORDER BY sen_counter RETURNING purchase_order_items.id, purchase_order_items.id AS id__1]
+[parameters: {'purchase_order_id__0': 7, 'product_id__0': 2, 'total_cost__0': 0.0, 'discount_percent__0': 0.0, 'quantity__0': 10, 'unit_cost__0': 0.0, 'purchase_order_id__1': 7, 'product_id__1': 5, 'total_cost__1': 0.0, 'discount_percent__1': 0.0, 'quantity__1': 10, 'unit_cost__1': 0.0, 'purchase_order_id__2': 7, 'product_id__2': 6, 'total_cost__2': 0.0, 'discount_percent__2': 0.0, 'quantity__2': 10, 'unit_cost__2': 0.0, 'purchase_order_id__3': 7, 'product_id__3': 4, 'total_cost__3': 0.0, 'discount_percent__3': 0.0, 'quantity__3': 10, 'unit_cost__3': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x15ca509deb0>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 48, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x15ca509deb0>'
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x15ca3f44590>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 48, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x15ca3f44590>'
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x15ca563ac60>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 62, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x15ca563ac60>'
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x21c5a159ac0>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 48, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x21c5a159ac0>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x21c5a1b84a0>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 62, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x21c5a1b84a0>'
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x21c59fdbe00>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 48, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x21c59fdbe00>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x21c59fcce90>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 62, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x21c59fcce90>'
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x21c59f7b5c0>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 48, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x21c59f7b5c0>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x21c5a1ba240>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 62, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x21c5a1ba240>'
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x2b5e90217c0>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 49, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x2b5e90217c0>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x2b5e8ebbce0>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 49, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x2b5e8ebbce0>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x2b5e8eb9250>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 63, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x2b5e8eb9250>'
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x2b5e9034740>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 49, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x2b5e9034740>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Could not refresh instance '<PurchaseOrder at 0x2b5e8e83e30>'
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 63, in create_po
+    db.refresh(db_po)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 3140, in refresh
+    raise sa_exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not refresh instance '<PurchaseOrder at 0x2b5e8e83e30>'
+
+==================================================
+Error creating GRN: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164858', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 48, 58, 505614)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 196, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164858', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 48, 58, 505614)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+\n==================================================\nError creating GRN: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164903', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 4, 1691)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 196, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164903', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 4, 1691)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+\n==================================================\nError creating GRN: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164908', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 8, 237167)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 196, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164908', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 8, 237167)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+\n==================================================\nError creating GRN: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164913', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 13, 159232)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 196, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164913', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 13, 159232)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+\n==================================================\nError creating GRN: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164919', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 19, 536705)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 196, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114164919', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 49, 19, 536705)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+\n==================================================\nError creating GRN: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114165024', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 50, 24, 312184)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.ForeignKeyViolation: insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 196, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) insert or update on table "grns" violates foreign key constraint "grns_supplier_id_fkey"
+DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
+
+[SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
+[parameters: {'custom_grn_no': 'GRN-260114165024', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 50, 24, 312184)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+\n==================================================\n

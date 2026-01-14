@@ -46,8 +46,23 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
             admin_password=get_password_hash(tenant_in.admin_password)
         )
         db.add(db_tenant)
+        db.flush()
+        db_tenant_id = db_tenant.id
         db.commit()
-        db.refresh(db_tenant)
+        # db.refresh(db_tenant) -- REMOVED per multi-tenant best practice
+        
+        # Restore tenant search path (although usually public for global tenant registry)
+        # But we were in public already. Let's be safe if we were in a specific context.
+        # Actually create_tenant runs as superadmin, usually public.
+        # But let's check db.info just in case.
+        tenant_schema = db.info.get('tenant_schema')
+        if tenant_schema:
+            db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+        else:
+             # Default to public if not set (create_tenant usually starts in public)
+             db.execute(text("SET search_path TO public"))
+
+        db_tenant = db.query(Tenant).filter(Tenant.id == db_tenant_id).first()
         
         # 4. Seed Tenant Data
         with SessionLocal() as sdb:

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
@@ -75,8 +76,16 @@ def create_crud_routes(model_class, router_prefix: str, create_schema, update_sc
         try:
             db_item = model_class(**item.dict(), created_by=user.id, updated_by=user.id)
             db.add(db_item)
+            db.flush()
+            item_id = db_item.id
             db.commit()
-            db.refresh(db_item)
+            
+            # Restore tenant search path after commit
+            tenant_schema = db.info.get('tenant_schema')
+            if tenant_schema:
+                db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+            
+            db_item = db.query(model_class).filter(model_class.id == item_id).first()
             return db_item
         except Exception as e:
             db.rollback()
@@ -106,7 +115,12 @@ def create_crud_routes(model_class, router_prefix: str, create_schema, update_sc
             setattr(db_item, field, value)
         
         db.commit()
-        db.refresh(db_item)
+        # Restore tenant search path
+        tenant_schema = db.info.get('tenant_schema')
+        if tenant_schema:
+            db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+            
+        db_item = db.query(model_class).filter(model_class.id == item_id).first()
         return db_item
     
     @router.delete(f"/{router_prefix}/{{item_id}}")
@@ -172,8 +186,16 @@ def create_sub_category(item: SubCategoryCreate, db: Session = Depends(get_db_wi
         
         db_item = SubCategory(**item.dict(), created_by=user.id, updated_by=user.id)
         db.add(db_item)
+        db.flush()
+        item_id = db_item.id
         db.commit()
-        db.refresh(db_item)
+        
+        # Restore tenant search path
+        tenant_schema = db.info.get('tenant_schema')
+        if tenant_schema:
+            db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+            
+        db_item = db.query(SubCategory).filter(SubCategory.id == item_id).first()
         return db_item
     except Exception as e:
         db.rollback()
@@ -210,7 +232,13 @@ def update_sub_category(item_id: int, item: SubCategoryUpdate, db: Session = Dep
         setattr(db_item, field, value)
     
     db.commit()
-    db.refresh(db_item)
+    
+    # Restore tenant search path
+    tenant_schema = db.info.get('tenant_schema')
+    if tenant_schema:
+        db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+        
+    db_item = db.query(SubCategory).filter(SubCategory.id == item_id).first()
     return db_item
 
 @router.delete("/sub-categories/{item_id}")

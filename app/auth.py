@@ -97,6 +97,7 @@ def get_db_with_tenant(x_tenant_id: str = Header(None)):
             raise HTTPException(status_code=404, detail=f"Tenant '{x_tenant_id}' not found")
             
         print(f"AUTH DEBUG: Setting search_path to '{tenant.schema_name}, public'")
+        db.info['tenant_schema'] = tenant.schema_name
         db.execute(text(f"SET search_path TO {tenant.schema_name}, public"))
         yield db
     finally:
