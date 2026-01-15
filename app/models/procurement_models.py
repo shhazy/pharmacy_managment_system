@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from ..database import Base
@@ -32,10 +32,13 @@ class PurchaseOrderItem(Base):
     purchase_order_id = Column(Integer, ForeignKey("purchase_orders.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
     
-    quantity = Column(Integer)
+    quantity = Column(Integer) # Total units
     unit_cost = Column(Float)
     discount_percent = Column(Float, default=0.0)
     total_cost = Column(Float)
+    
+    purchase_conversion_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
+    factor = Column(Integer, default=1)
     
     purchase_order = relationship("PurchaseOrder", back_populates="items")
     product = relationship("Product")
@@ -98,5 +101,78 @@ class GRNItem(Base):
     total_cost = Column(Float)
     retail_price = Column(Float)
     
+    purchase_conversion_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
+    factor = Column(Integer, default=1)
+    
     grn = relationship("GRN", back_populates="items")
     product = relationship("Product")
+
+# --- STOCK INVENTORY MANAGEMENT ---
+
+class StockInventory(Base):
+    """
+    Detailed inventory tracking per batch with GRN traceability.
+    This table maintains granular stock records linked to specific GRN entries.
+    """
+    __tablename__ = "stock_inventory"
+    
+    inventory_id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    batch_number = Column(String(100), index=True)
+    expiry_date = Column(DateTime, nullable=True)
+    
+    quantity = Column(Float, nullable=False, default=0)
+    unit_cost = Column(Float, nullable=True)  # Landed cost per unit
+    selling_price = Column(Float, nullable=True)
+    
+    warehouse_location = Column(String(100), nullable=True)  # Shelf/rack location
+    store_id = Column(Integer, ForeignKey("stores.id"), nullable=True)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=True)
+    grn_id = Column(Integer, ForeignKey("grns.id"), nullable=True)  # Trace back to GRN if available
+    
+    is_available = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    product = relationship("Product")
+    supplier = relationship("Supplier")
+    grn = relationship("GRN")
+    adjustments = relationship("StockAdjustment", back_populates="inventory")
+
+class StockAdjustment(Base):
+    """
+    Track all stock adjustments with full audit trail.
+    Handles physical counts, damages, expiry, theft, returns, etc.
+    """
+    __tablename__ = "stock_adjustments"
+    
+    adjustment_id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    batch_number = Column(String(100), nullable=True)
+    inventory_id = Column(Integer, ForeignKey("stock_inventory.inventory_id"), nullable=True)
+    
+    adjustment_type = Column(String(50), nullable=False)  
+    # Types: 'physical_count', 'damage', 'expiry', 'theft', 'return_to_supplier', 'other'
+    
+    quantity_adjusted = Column(Float, nullable=False)  # Negative for reductions
+    previous_quantity = Column(Float, nullable=True)
+    new_quantity = Column(Float, nullable=True)
+    
+    reason = Column(Text, nullable=True)
+    reference_number = Column(String(100), nullable=True)  # Physical count sheet #, damage report #, etc.
+    
+    adjustment_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    adjusted_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    approved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    
+    status = Column(String(20), default="pending")  # 'pending', 'approved', 'rejected'
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    product = relationship("Product")
+    inventory = relationship("StockInventory", back_populates="adjustments")
+    adjuster = relationship("User", foreign_keys=[adjusted_by])
+    approver = relationship("User", foreign_keys=[approved_by])
+

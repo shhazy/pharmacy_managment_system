@@ -5,7 +5,7 @@ from sqlalchemy import func, text
 from datetime import datetime, timedelta
 from sqlalchemy.orm import joinedload
 
-from ..models import Category, Manufacturer, Store, Supplier, Patient, Invoice, Batch, Product, InvoiceItem, RegulatoryLog, User
+from ..models import Category, Manufacturer, Store, Supplier, Patient, Invoice, StockInventory, Product, InvoiceItem, RegulatoryLog, User
 from ..schemas import InvoiceCreate
 from ..auth import get_db_with_tenant, get_current_tenant_user
 
@@ -93,11 +93,15 @@ def create_invoice(inv_in: InvoiceCreate, db: Session = Depends(get_db_with_tena
         invoice_items = []
         
         for item in inv_in.items:
-            batch = db.query(Batch).filter(Batch.id == item.batch_id, Batch.product_id == item.medicine_id).first()
-            if not batch or batch.current_stock < item.quantity:
+            # batch_id in request maps to inventory_id in StockInventory
+            inv_item = db.query(StockInventory).filter(
+                StockInventory.inventory_id == item.batch_id, 
+                StockInventory.product_id == item.medicine_id
+            ).first()
+            if not inv_item or inv_item.quantity < item.quantity:
                 raise HTTPException(status_code=400, detail=f"Insufficient stock for {item.medicine_id} batch {item.batch_id}")
             
-            batch.current_stock -= item.quantity
+            inv_item.quantity -= item.quantity
             line_total = item.unit_price * item.quantity
             tax = line_total * (item.tax_percent / 100)
             disc = line_total * (item.discount_percent / 100)
@@ -152,20 +156,48 @@ def create_invoice(inv_in: InvoiceCreate, db: Session = Depends(get_db_with_tena
         if isinstance(e, HTTPException): raise e
         raise HTTPException(status_code=500, detail=str(e))
 
-# Stock Transfer (at root for compatibility)
 @router.post("/stock/transfer")
 def transfer_stock(from_id: int, to_id: int, med_id: int, qty: int, db: Session = Depends(get_db_with_tenant)):
     from fastapi import HTTPException
     from ..models import StockTransfer
     
-    batch = db.query(Batch).filter(Batch.product_id == med_id, Batch.store_id == from_id).first()
-    if not batch or batch.current_stock < qty:
+    # Simple logic: find first available inventory in source store
+    inv_item = db.query(StockInventory).filter(
+        StockInventory.product_id == med_id, 
+        StockInventory.store_id == from_id,
+        StockInventory.quantity >= qty
+    ).first()
+    
+    if not inv_item:
         raise HTTPException(status_code=400, detail="Insufficient stock at source branch")
     
-    batch.current_stock -= qty
+    inv_item.quantity -= qty
+    
+    # Create new inventory entry at destination or update if same batch exists
+    dest_inv = db.query(StockInventory).filter(
+        StockInventory.product_id == med_id,
+        StockInventory.store_id == to_id,
+        StockInventory.batch_number == inv_item.batch_number
+    ).first()
+    
+    if dest_inv:
+        dest_inv.quantity += qty
+    else:
+        new_inv = StockInventory(
+            product_id=med_id,
+            store_id=to_id,
+            batch_number=inv_item.batch_number,
+            expiry_date=inv_item.expiry_date,
+            quantity=qty,
+            unit_cost=inv_item.unit_cost,
+            selling_price=inv_item.selling_price,
+            grn_id=inv_item.grn_id
+        )
+        db.add(new_inv)
+        
     transfer = StockTransfer(from_store_id=from_id, to_store_id=to_id, medicine_id=med_id, quantity=qty)
     db.add(transfer); db.commit()
-    return {"message": "Transfer initiated"}
+    return {"message": "Transfer successful"}
 
 # Reports (at root for compatibility)
 @router.get("/reports/daily-sales")
@@ -178,8 +210,13 @@ def get_daily_sales(db: Session = Depends(get_db_with_tenant), user: User = Depe
 @router.get("/reports/expiry-alerts")
 def get_expiry_alerts(db: Session = Depends(get_db_with_tenant)):
     next_90_days = datetime.utcnow() + timedelta(days=90)
-    return db.query(Batch).join(Medicine).filter(Batch.expiry_date <= next_90_days, Batch.current_stock > 0).all()
+    return db.query(StockInventory).join(Product).filter(
+        StockInventory.expiry_date <= next_90_days, 
+        StockInventory.quantity > 0
+    ).all()
 
 @router.get("/reports/low-stock")
 def get_low_stock(db: Session = Depends(get_db_with_tenant)):
-    return db.query(Product).join(Batch).group_by(Product.id).having(func.sum(Batch.current_stock) <= Product.reorder_level).all()
+    return db.query(Product).join(StockInventory).group_by(Product.id).having(
+        func.sum(StockInventory.quantity) <= Product.reorder_level
+    ).all()

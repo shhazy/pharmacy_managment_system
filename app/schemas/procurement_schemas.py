@@ -8,12 +8,22 @@ class PurchaseOrderItemBase(BaseModel):
     unit_cost: float
     discount_percent: float = 0.0
     total_cost: float
+    purchase_conversion_unit_id: Optional[int] = None
+    factor: int = 1
 
 class PurchaseOrderItemCreate(PurchaseOrderItemBase):
     pass
 
+class ProductSimplified(BaseModel):
+    id: int
+    product_name: str
+    retail_price: Optional[float] = 0.0
+    purchase_conv_unit_id: Optional[int] = None
+    purchase_conv_factor: Optional[int] = 1
+
 class PurchaseOrderItemResponse(PurchaseOrderItemBase):
     id: int
+    product: Optional[ProductSimplified] = None
     class Config:
         from_attributes = True
 
@@ -68,6 +78,7 @@ class POSuggestionItem(BaseModel):
     suggested_qty: int
     cost_price: float
     manufacturer: str
+    purchase_conv_unit_id: Optional[int] = None
 
 # --- GRN Schemas ---
 class GRNItemCreate(BaseModel):
@@ -79,6 +90,8 @@ class GRNItemCreate(BaseModel):
     unit_cost: float
     total_cost: float
     retail_price: float
+    purchase_conversion_unit_id: Optional[int] = None
+    factor: int = 1
 
 class GRNCreate(BaseModel):
     supplier_id: int

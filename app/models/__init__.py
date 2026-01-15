@@ -4,11 +4,11 @@ from .public_models import Tenant, SuperAdmin
 from .user_models import User, Role, Permission, Store, user_roles, role_permissions
 from .pharmacy_models import (
     Manufacturer, Category, Product, ProductIngredient, 
-    ProductSupplier, ProductHistory, Batch, Supplier
+    ProductSupplier, ProductHistory, Supplier
 )
-from .procurement_models import PurchaseOrder, PurchaseOrderItem, StockTransfer, GRN, GRNItem
+from .procurement_models import PurchaseOrder, PurchaseOrderItem, StockTransfer, GRN, GRNItem, StockInventory, StockAdjustment
 from .sales_models import Patient, Prescription, Invoice, InvoiceItem, SalesReturn
-from .service_models import TemperatureLog, RegulatoryLog, StockAdjustment
+from .service_models import TemperatureLog, RegulatoryLog
 from .inventory_models import (
     LineItem, SubCategory, ProductGroup, CategoryGroup,
     Generic, CalculateSeason, Rack, PurchaseConversionUnit
@@ -30,7 +30,6 @@ __all__ = [
     "ProductIngredient",
     "ProductSupplier",
     "ProductHistory",
-    "Batch",
     "Supplier",
     "PurchaseOrder",
     "PurchaseOrderItem",
@@ -51,4 +50,7 @@ __all__ = [
     "CalculateSeason",
     "Rack",
     "PurchaseConversionUnit",
+    "GRN",
+    "GRNItem",
+    "StockInventory",
 ]

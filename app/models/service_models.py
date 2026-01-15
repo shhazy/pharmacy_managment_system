@@ -20,10 +20,3 @@ class RegulatoryLog(Base):
     patient_id = Column(Integer, ForeignKey("patients.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-class StockAdjustment(Base):
-    __tablename__ = "stock_adjustments"
-    id = Column(Integer, primary_key=True, index=True)
-    batch_id = Column(Integer, ForeignKey("batches.id"))
-    change_qty = Column(Integer) # Negative for damage/waste, Positive for corrections
-    reason = Column(String) # Waste, Expiry, Damage, Correction
-    created_at = Column(DateTime, default=datetime.utcnow)

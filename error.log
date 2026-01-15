@@ -810,4 +810,128 @@ DETAIL:  Key (supplier_id)=(1) is not present in table "suppliers".
 [SQL: INSERT INTO grns (custom_grn_no, supplier_id, po_id, invoice_no, invoice_date, bill_no, bill_date, due_date, payment_mode, comments, sub_total, loading_exp, freight_exp, other_exp, purchase_tax, advance_tax, discount, net_total, status, created_at) VALUES (%(custom_grn_no)s, %(supplier_id)s, %(po_id)s, %(invoice_no)s, %(invoice_date)s, %(bill_no)s, %(bill_date)s, %(due_date)s, %(payment_mode)s, %(comments)s, %(sub_total)s, %(loading_exp)s, %(freight_exp)s, %(other_exp)s, %(purchase_tax)s, %(advance_tax)s, %(discount)s, %(net_total)s, %(status)s, %(created_at)s) RETURNING grns.id]
 [parameters: {'custom_grn_no': 'GRN-260114165024', 'supplier_id': 1, 'po_id': 10, 'invoice_no': '45', 'invoice_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'bill_no': '45', 'bill_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'due_date': datetime.datetime(2026, 1, 14, 0, 0, tzinfo=TzInfo(UTC)), 'payment_mode': 'Cash', 'comments': 'Loaded from PO #PO-260114151949 ', 'sub_total': 0, 'loading_exp': 0.0, 'freight_exp': 0.0, 'other_exp': 0.0, 'purchase_tax': 0.0, 'advance_tax': 0.0, 'discount': 0.0, 'net_total': 0, 'status': 'Completed', 'created_at': datetime.datetime(2026, 1, 14, 11, 50, 24, 312184)}]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
-\n==================================================\n
+\n==================================================\nError creating PO: Instance '<PurchaseOrder at 0x27b619b2b70>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 62, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x27b619b2b70>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: Instance '<PurchaseOrder at 0x27b61c4e810>' has been deleted, or its row is otherwise not present.
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 62, in create_po
+    po_id = db_po.id
+            ^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 566, in __get__
+    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1086, in get
+    value = self._fire_loader_callables(state, key, passive)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\attributes.py", line 1116, in _fire_loader_callables
+    return state._load_expired(state, passive)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state.py", line 798, in _load_expired
+    self.manager.expired_attribute_loader(self, toload, passive)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\loading.py", line 1663, in load_scalar_attributes
+    raise orm_exc.ObjectDeletedError(state)
+sqlalchemy.orm.exc.ObjectDeletedError: Instance '<PurchaseOrder at 0x27b61c4e810>' has been deleted, or its row is otherwise not present.
+
+==================================================
+Error creating PO: (psycopg2.errors.UndefinedColumn) column "purchase_conversion_unit_id" of relation "purchase_order_items" does not exist
+LINE 1: ...uantity, unit_cost, discount_percent, total_cost, purchase_c...
+                                                             ^
+
+[SQL: INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_cost, discount_percent, total_cost, purchase_conversion_unit_id, factor) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::FLOAT, p4::FLOAT, p5::FLOAT, p6::INTEGER, p7::I ... 424 characters truncated ... en_counter) ORDER BY sen_counter RETURNING purchase_order_items.id, purchase_order_items.id AS id__1]
+[parameters: {'purchase_conversion_unit_id__0': 1, 'total_cost__0': 12000.0, 'unit_cost__0': 500.0, 'product_id__0': 2, 'purchase_order_id__0': 2, 'factor__0': 24, 'discount_percent__0': 0.0, 'quantity__0': 24, 'purchase_conversion_unit_id__1': None, 'total_cost__1': 80.0, 'unit_cost__1': 8.0, 'product_id__1': 1, 'purchase_order_id__1': 2, 'factor__1': 1, 'discount_percent__1': 0.0, 'quantity__1': 10}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column "purchase_conversion_unit_id" of relation "purchase_order_items" does not exist
+LINE 1: ...uantity, unit_cost, discount_percent, total_cost, purchase_c...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 71, in create_po
+    db.commit() # Final commit
+    ^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1137, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_insertmany_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2121, in _exec_insertmany_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "purchase_conversion_unit_id" of relation "purchase_order_items" does not exist
+LINE 1: ...uantity, unit_cost, discount_percent, total_cost, purchase_c...
+                                                             ^
+
+[SQL: INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_cost, discount_percent, total_cost, purchase_conversion_unit_id, factor) SELECT p0::INTEGER, p1::INTEGER, p2::INTEGER, p3::FLOAT, p4::FLOAT, p5::FLOAT, p6::INTEGER, p7::I ... 424 characters truncated ... en_counter) ORDER BY sen_counter RETURNING purchase_order_items.id, purchase_order_items.id AS id__1]
+[parameters: {'purchase_conversion_unit_id__0': 1, 'total_cost__0': 12000.0, 'unit_cost__0': 500.0, 'product_id__0': 2, 'purchase_order_id__0': 2, 'factor__0': 24, 'discount_percent__0': 0.0, 'quantity__0': 24, 'purchase_conversion_unit_id__1': None, 'total_cost__1': 80.0, 'unit_cost__1': 8.0, 'product_id__1': 1, 'purchase_order_id__1': 2, 'factor__1': 1, 'discount_percent__1': 0.0, 'quantity__1': 10}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+==================================================

@@ -6,7 +6,7 @@ import traceback
 
 from ..models import (
     Patient, Invoice, InvoiceItem, SalesReturn, 
-    Batch, Product, RegulatoryLog, User
+    StockInventory, Product, RegulatoryLog, User
 )
 from ..schemas import InvoiceCreate
 from ..auth import get_db_with_tenant, get_current_tenant_user

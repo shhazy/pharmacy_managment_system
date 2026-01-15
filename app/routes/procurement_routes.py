@@ -22,7 +22,9 @@ def list_pos(
     status: Optional[str] = None,
     db: Session = Depends(get_db_with_tenant)
 ):
-    query = db.query(PurchaseOrder).options(joinedload(PurchaseOrder.items))
+    query = db.query(PurchaseOrder).options(
+        joinedload(PurchaseOrder.items).joinedload(PurchaseOrderItem.product)
+    )
     
     if supplier_id:
         query = query.filter(PurchaseOrder.supplier_id == supplier_id)
@@ -33,7 +35,9 @@ def list_pos(
 
 @router.get("/orders/{order_id}", response_model=PurchaseOrderResponse)
 def get_po(order_id: int, db: Session = Depends(get_db_with_tenant)):
-    po = db.query(PurchaseOrder).options(joinedload(PurchaseOrder.items)).filter(PurchaseOrder.id == order_id).first()
+    po = db.query(PurchaseOrder).options(
+        joinedload(PurchaseOrder.items).joinedload(PurchaseOrderItem.product)
+    ).filter(PurchaseOrder.id == order_id).first()
     if not po:
         raise HTTPException(status_code=404, detail="Purchase Order not found")
     return po
@@ -58,21 +62,17 @@ def create_po(po_in: PurchaseOrderCreate, db: Session = Depends(get_db_with_tena
             notes=po_in.notes
         )
         db.add(db_po)
-        db.commit() # Commit PO to get ID
+        db.flush() # Flush to get ID
         po_id = db_po.id
         
         for item in po_in.items:
             db_item = PurchaseOrderItem(
                 purchase_order_id=po_id,
-                product_id=item.product_id,
-                quantity=item.quantity,
-                unit_cost=item.unit_cost,
-                discount_percent=item.discount_percent,
-                total_cost=item.total_cost
+                **item.dict()
             )
             db.add(db_item)
         
-        db.commit() # Commit items
+        db.commit() # Final commit
         # db.refresh(db_po)
         
         # Restore tenant search path
@@ -113,7 +113,6 @@ def update_po(order_id: int, po_in: PurchaseOrderUpdate, db: Session = Depends(g
             db.add(db_item)
             
     db.commit()
-    # db.refresh(db_po)
     
     # Restore tenant search path
     tenant_schema = db.info.get('tenant_schema')
@@ -137,49 +136,60 @@ def delete_po(order_id: int, db: Session = Depends(get_db_with_tenant)):
 
 @router.post("/generate", response_model=List[POSuggestionItem])
 def generate_suggestions(req: POGenerateRequest, db: Session = Depends(get_db_with_tenant)):
-    from ..models import Batch
-    # Fetch all products for the supplier
-    products = db.query(Product).filter(Product.supplier_id == req.supplier_id).all()
-    suggestions = []
-    
-    for p in products:
-        current_stock = db.query(func.sum(Batch.current_stock)).filter(Batch.product_id == p.id).scalar() or 0
+    try:
+        from ..models import StockInventory
+        # Fetch products for the supplier with joinedload for efficiency
+        products = db.query(Product).options(joinedload(Product.manufacturer)).filter(Product.supplier_id == req.supplier_id).all()
+        suggestions = []
         
-        pending_qty = db.query(func.sum(PurchaseOrderItem.quantity)).join(PurchaseOrder).filter(
-            PurchaseOrder.status == "Pending",
-            PurchaseOrderItem.product_id == p.id
-        ).scalar() or 0
-        
-        suggested_qty = 0
-        if req.method == 'min':
-            suggested_qty = max(0, (p.min_inventory_level or 0) - current_stock - pending_qty)
-        elif req.method == 'optimal':
-            suggested_qty = max(0, (p.optimal_inventory_level or 0) - current_stock - pending_qty)
-        elif req.method == 'max':
-            suggested_qty = max(0, (p.max_inventory_level or 0) - current_stock - pending_qty)
-        elif req.method == 'sale' and req.sale_start_date and req.sale_end_date:
-            days = (req.sale_end_date - req.sale_start_date).days or 1
-            suggested_qty = max(0, (days // 2) - current_stock - pending_qty)
+        for p in products:
+            current_stock = db.query(func.sum(StockInventory.quantity)).filter(
+                StockInventory.product_id == p.id,
+                StockInventory.is_available == True
+            ).scalar() or 0
             
-        if suggested_qty > 0 or req.method == 'none':
-            mfg = db.query(Manufacturer).get(p.manufacturer_id)
-            suggestions.append(POSuggestionItem(
-                product_id=p.id,
-                product_name=p.product_name,
-                product_code=p.product_code or str(p.id),
-                current_stock=current_stock,
-                suggested_qty=suggested_qty,
-                cost_price=p.average_cost or 0.0,
-                manufacturer=mfg.name if mfg else "Unknown"
-            ))
+            pending_qty = db.query(func.sum(PurchaseOrderItem.quantity)).join(PurchaseOrder).filter(
+                PurchaseOrder.status == "Pending",
+                PurchaseOrderItem.product_id == p.id
+            ).scalar() or 0
             
-    return suggestions
+            suggested_qty = 0
+            if req.method == 'min':
+                suggested_qty = max(0, (p.min_inventory_level or 0) - current_stock - pending_qty)
+            elif req.method == 'optimal':
+                suggested_qty = max(0, (p.optimal_inventory_level or 0) - current_stock - pending_qty)
+            elif req.method == 'max':
+                suggested_qty = max(0, (p.max_inventory_level or 0) - current_stock - pending_qty)
+            elif req.method == 'sale' and req.sale_start_date and req.sale_end_date:
+                days = (req.sale_end_date - req.sale_start_date).days or 1
+                suggested_qty = max(0, (days // 2) - current_stock - pending_qty)
+                
+            if suggested_qty > 0 or req.method == 'none':
+                suggestions.append(POSuggestionItem(
+                    product_id=p.id,
+                    product_name=p.product_name,
+                    product_code=str(p.id), # Product code is removed, using ID as fallback
+                    current_stock=current_stock,
+                    suggested_qty=suggested_qty,
+                    cost_price=p.average_cost or 0.0,
+                    manufacturer=p.manufacturer.name if p.manufacturer else "Unknown",
+                    purchase_conv_unit_id=p.purchase_conv_unit_id
+                ))
+                
+        return suggestions
+    except Exception as e:
+        import traceback
+        with open("error.log", "a") as f:
+            f.write(f"Error generating suggestions: {str(e)}\n")
+            f.write(traceback.format_exc())
+            f.write("\n" + "="*50 + "\n")
+        raise e
 
 # --- GRN Routes ---
 
 @router.post("/grn", response_model=GRNResponse)
 def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
-    from ..models import Batch
+    from ..models import StockInventory
     from ..models.user_models import Store
     
     try:
@@ -226,14 +236,7 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
             # Create GRNItem
             db_item = GRNItem(
                 grn_id=db_grn.id,
-                product_id=item.product_id,
-                batch_no=item.batch_no,
-                expiry_date=item.expiry_date,
-                pack_size=item.pack_size,
-                quantity=item.quantity,
-                unit_cost=item.unit_cost,
-                total_cost=item.total_cost,
-                retail_price=item.retail_price
+                **item.dict()
             )
             db.add(db_item)
             calculated_sub_total += item.total_cost
@@ -241,37 +244,29 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
             # --- Inventory & Cost Logic ---
             product = db.query(Product).get(item.product_id)
             if product:
-                # Find or Create Batch
-                # Check for existing batch
-                batch = db.query(Batch).filter(
-                    Batch.product_id == item.product_id,
-                    Batch.batch_number == item.batch_no
-                ).first()
+                # ✅ CREATE STOCK_INVENTORY ENTRY
+                # This is now the primary inventory tracking system
+                from ..models import StockInventory
                 
-                if batch:
-                    # Update stock
-                    batch.current_stock += item.quantity
-                else:
-                    # Create new batch
-                    # Default store
-                    store = db.query(Store).first()
-                    store_id = store.id if store else 1
-                    
-                    batch = Batch(
-                        product_id=item.product_id,
-                        store_id=store_id,
-                        batch_number=item.batch_no,
-                        expiry_date=item.expiry_date,
-                        purchase_price=item.unit_cost,
-                        mrp=item.retail_price,
-                        sale_price=item.retail_price,
-                        current_stock=item.quantity,
-                        initial_stock=item.quantity
-                    )
-                    db.add(batch)
+                stock_inv = StockInventory(
+                    product_id=item.product_id,
+                    batch_number=item.batch_no,
+                    expiry_date=item.expiry_date,
+                    quantity=item.quantity,
+                    unit_cost=item.unit_cost,
+                    selling_price=item.retail_price,
+                    warehouse_location=None,  # Can be set later or from GRN input
+                    supplier_id=grn_in.supplier_id,
+                    grn_id=db_grn.id,
+                    is_available=True
+                )
+                db.add(stock_inv)
                 
                 # Update Product Average Cost (Weighted Average)
-                total_stock = db.query(func.sum(Batch.current_stock)).filter(Batch.product_id == item.product_id).scalar() or 0
+                total_stock = db.query(func.sum(StockInventory.quantity)).filter(
+                    StockInventory.product_id == item.product_id,
+                    StockInventory.is_available == True
+                ).scalar() or 0
                 old_avg = product.average_cost or 0
                 
                 # total_stock includes current batch update? 

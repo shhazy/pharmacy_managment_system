@@ -8,7 +8,7 @@ import traceback
 from ..database import engine, Base, get_db, SessionLocal
 from ..models import (
     Tenant, User, Role, Product, SuperAdmin, Permission, 
-    Batch, Category, Manufacturer, Supplier, Store
+    StockInventory, Category, Manufacturer, Supplier, Store
 )
 from ..schemas import TenantCreate, TenantResponse
 from ..auth import get_password_hash, get_current_superadmin
@@ -89,16 +89,29 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
                               hashed_password=db_tenant.admin_password, roles=[admin_role], store_id=main_store.id)
             sdb.add(admin_user)
             
-            # 4. Sample Product
+            # 4. Generics
+            from ..models import Generic
+            paracetamol = Generic(name="Paracetamol")
+            sdb.add(paracetamol)
+            sdb.flush()
+
+            # 5. Sample Product
             sample_product = Product(
-                product_name="Panadol CF", generic_name="Paracetamol", brand_name="Panadol",
-                category_id=cats[1].id, manufacturer_id=mans[2].id, unit="Tablet", strength="500mg"
+                product_name="Panadol CF",
+                category_id=cats[1].id, 
+                manufacturer_id=mans[2].id,
+                generics_id=paracetamol.id,
+                supplier_id=sups[0].id,
+                retail_price=10.0,
+                average_cost=5.0
             )
             sdb.add(sample_product); sdb.flush()
-            sdb.add(Batch(product_id=sample_product.id, store_id=main_store.id, batch_number="BN-101", 
-                          expiry_date=datetime.now()+timedelta(days=365),
-                          purchase_price=5.0, mrp=10.0, sale_price=9.5, 
-                          current_stock=200, initial_stock=200))
+            sdb.add(StockInventory(
+                product_id=sample_product.id, store_id=main_store.id, batch_number="BN-101", 
+                expiry_date=datetime.now()+timedelta(days=365),
+                unit_cost=5.0, selling_price=9.5, 
+                quantity=200, grn_id=None
+            ))
             
             sdb.commit()
         return db_tenant

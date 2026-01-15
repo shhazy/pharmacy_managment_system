@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import text
 
-from ..models import Product, ProductIngredient, ProductSupplier, ProductHistory, Batch, User
+from ..models import Product, ProductIngredient, ProductSupplier, ProductHistory, StockInventory, User
 from ..schemas import MedicineCreate
 from ..auth import get_db_with_tenant, get_current_tenant_user
 
@@ -11,25 +11,55 @@ router = APIRouter()
 @router.get("/search")
 def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
     from sqlalchemy import or_, func
-    results = db.query(Product, func.sum(Batch.current_stock).label("current_stock"))\
-        .outerjoin(Batch)\
+    from ..models.procurement_models import StockInventory
+    from ..models.pharmacy_models import Product, Category, Manufacturer
+    from ..models.inventory_models import Generic
+    
+    results = db.query(
+            Product, 
+            func.sum(StockInventory.quantity).label("current_stock"),
+            Category.name.label("category_name"),
+            Manufacturer.name.label("manufacturer_name"),
+            Generic.name.label("generic_name")
+        )\
+        .outerjoin(StockInventory, Product.id == StockInventory.product_id)\
+        .outerjoin(Category, Product.category_id == Category.id)\
+        .outerjoin(Manufacturer, Product.manufacturer_id == Manufacturer.id)\
+        .outerjoin(Generic, Product.generics_id == Generic.id)\
+        .options(joinedload(Product.stock_inventory))\
         .filter(
             or_(
-                Product.product_name.ilike(f"%{q}%"),
-                Product.product_code.ilike(f"%{q}%"),
-                Product.barcode.ilike(f"%{q}%")
+                Product.product_name.ilike(f"%{q}%")
             )
         )\
-        .group_by(Product.id)\
+        .group_by(Product.id, Category.name, Manufacturer.name, Generic.name)\
         .all()
     
     # Map to list of dicts or enhanced objects
     response = []
-    for product, stock in results:
-        p_dict = product.__dict__.copy()
-        if '_sa_instance_state' in p_dict:
-            del p_dict['_sa_instance_state']
-        p_dict['current_stock'] = stock or 0
+    for product, stock, cat_name, man_name, gen_name in results:
+        p_dict = {
+            "id": product.id,
+            "product_name": product.product_name,
+            "name": product.product_name, # Alias for compatibility
+            "generic_name": gen_name or "N/A",
+            "retail_price": product.retail_price,
+            "current_stock": stock or 0,
+            "supplier_id": product.supplier_id,
+            "manufacturer_id": product.manufacturer_id,
+            "category": {"id": product.category_id, "name": cat_name or "Uncategorized"},
+            "manufacturer": {"id": product.manufacturer_id, "name": man_name or "N/A"},
+            "stock_inventory": [
+                {
+                    "inventory_id": s.inventory_id,
+                    "id": s.inventory_id, # Alias for compatibility
+                    "batch_number": s.batch_number,
+                    "quantity": s.quantity,
+                    "selling_price": s.selling_price,
+                    "expiry_date": s.expiry_date.isoformat() if s.expiry_date else None
+                } for s in product.stock_inventory if s.is_available
+            ] if hasattr(product, 'stock_inventory') else []
+        }
         response.append(p_dict)
     return response
 
@@ -45,23 +75,20 @@ def get_product_details(id: int, db: Session = Depends(get_db_with_tenant)):
 
 @router.post("/")
 def add_product(med: MedicineCreate, db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):
-    # 1. Validation
-    if med.product_code and db.query(Product).filter(Product.product_code == med.product_code).first():
-        raise HTTPException(status_code=400, detail="Product Code already exists")
-        
+    # 1. Creation
     new_m = Product(
         product_name=med.name or med.product_name if hasattr(med, 'product_name') else med.name,
-        generic_name=med.generic_name, brand_name=med.brand_name,
-        category_id=med.category_id, manufacturer_id=med.manufacturer_id,
-        uom=med.uom, pack_size=med.pack_size, pack_type=med.pack_type,
-        moq=med.moq, max_stock=med.max_stock, shelf_life_months=med.shelf_life_months,
-        tax_rate=med.tax_rate, discount_allowed=med.discount_allowed, max_discount=med.max_discount,
-        is_narcotic=med.is_narcotic, schedule_type=med.schedule_type,
-        barcode=med.barcode, hsn_code=med.hsn_code, product_code=med.product_code,
-        image_url=med.image_url, description=med.description,
-        pregnancy_category=med.pregnancy_category, lactation_safety=med.lactation_safety,
-        storage_conditions=med.storage_conditions, license_number=med.license_number,
-        is_cold_chain=med.is_cold_chain
+        category_id=med.category_id, 
+        sub_category_id=getattr(med, 'sub_category_id', None),
+        product_group_id=getattr(med, 'product_group_id', None),
+        category_group_id=getattr(med, 'category_group_id', None),
+        generics_id=med.generics_id if hasattr(med, 'generics_id') else getattr(med, 'category_id', None),
+        manufacturer_id=med.manufacturer_id,
+        rack_id=getattr(med, 'rack_id', None),
+        supplier_id=getattr(med, 'supplier_id', None),
+        purchase_conv_unit_id=getattr(med, 'purchase_conv_unit_id', None),
+        product_type=getattr(med, 'product_type', 1),
+        active=True
     )
     db.add(new_m); db.flush()
     
@@ -73,8 +100,15 @@ def add_product(med: MedicineCreate, db: Session = Depends(get_db_with_tenant), 
         db.add(ProductSupplier(product_id=new_m.id, **sup.dict()))
         
     if med.batch:
-        store_id = med.batch.store_id or user.store_id
-        db.add(Batch(product_id=new_m.id, **med.batch.dict(exclude={'store_id'}), store_id=store_id, initial_stock=med.batch.current_stock))
+        db.add(StockInventory(
+            product_id=new_m.id, 
+            batch_number=med.batch.batch_number,
+            expiry_date=med.batch.expiry_date,
+            quantity=med.batch.current_stock,
+            unit_cost=med.batch.purchase_price,
+            selling_price=med.batch.sale_price,
+            grn_id=None
+        ))
     
     # 3. History Log
     db.add(ProductHistory(product_id=new_m.id, user_id=user.id, change_type="CREATE", changes={"action": "Initial Creation"}))

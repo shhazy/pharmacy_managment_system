@@ -47,7 +47,7 @@ class InvoiceItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     invoice_id = Column(Integer, ForeignKey("invoices.id"))
     medicine_id = Column(Integer, ForeignKey("products.id"))  # kept column name for compatibility
-    batch_id = Column(Integer, ForeignKey("batches.id"))
+    batch_id = Column(Integer, ForeignKey("stock_inventory.inventory_id"))
     quantity = Column(Integer)
     unit_price = Column(Float)
     total_price = Column(Float)
