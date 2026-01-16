@@ -114,6 +114,19 @@ class ProductHistory(Base):
     product = relationship("Product", back_populates="history")
 
 
+class PharmacySettings(Base):
+    __tablename__ = "pharmacy_settings"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=True)
+    logo_url = Column(Text, nullable=True) # Can store base64 or URL
+    tagline = Column(String, nullable=True)
+    phone_no = Column(String, nullable=True)
+    license_no = Column(String, nullable=True)
+    address = Column(Text, nullable=True)
+    email = Column(String, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    theme_config = Column(JSON, nullable=True)
+
 class Supplier(Base):
     __tablename__ = "suppliers"
     id = Column(Integer, primary_key=True, index=True)

@@ -37,3 +37,5 @@ def patient_history(patient_id: int, db: Session = Depends(get_db_with_tenant)):
 # Note: Removed broken copy-pasted invoice creation code that was here.
 
 # Patients routes are at root level for compatibility
+
+

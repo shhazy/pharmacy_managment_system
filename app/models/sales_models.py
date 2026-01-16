@@ -52,6 +52,7 @@ class InvoiceItem(Base):
     unit_price = Column(Float)
     total_price = Column(Float)
     invoice = relationship("Invoice", back_populates="items")
+    product = relationship("Product")
 
 class SalesReturn(Base):
     __tablename__ = "sales_returns"

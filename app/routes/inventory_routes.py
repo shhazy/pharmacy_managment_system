@@ -43,6 +43,7 @@ def get_inventory(db: Session = Depends(get_db_with_tenant), user: User = Depend
             "purchase_conv_factor": p.purchase_conv_factor,
             "average_cost": p.average_cost,
             "retail_price": p.retail_price,
+            "control_drug": p.control_drug,
             "min_inventory_level": p.min_inventory_level,
             "optimal_inventory_level": p.optimal_inventory_level,
             "max_inventory_level": p.max_inventory_level,

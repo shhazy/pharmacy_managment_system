@@ -51,6 +51,7 @@ class POSItem(BaseModel):
     quantity: int
     unit_price: float
     discount_percent: float = 0
+    discount_amount: float = 0
     tax_percent: float = 0
 
 class InvoiceCreate(BaseModel):
@@ -58,3 +59,4 @@ class InvoiceCreate(BaseModel):
     items: List[POSItem]
     payment_method: str = "Cash"
     discount_amount: float = 0
+    status: str = "Paid"
