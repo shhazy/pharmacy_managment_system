@@ -14,6 +14,15 @@ app = FastAPI(title="Pro Pharmacy ERP API")
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+# CORS MUST BE THE FIRST MIDDLEWARE!
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r".*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]  # ADD THIS LINE - important!
+)
 # GLOBAL EXCEPTION HANDLER
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -45,13 +54,13 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
     return response
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r".*",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origin_regex=r".*",
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 # Include all routes
 app.include_router(api_router)
 
@@ -72,3 +81,4 @@ def startup():
     except Exception as e:
         print(f"ERROR during startup: {e}")
         traceback.print_exc()
+

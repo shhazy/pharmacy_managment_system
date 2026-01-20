@@ -1,12 +1,12 @@
-# Common routes that are at root level for backward compatibility
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from datetime import datetime, timedelta
 from sqlalchemy.orm import joinedload
+from typing import List
 
-from ..models import Category, Manufacturer, Store, Supplier, Patient, Invoice, StockInventory, Product, InvoiceItem, RegulatoryLog, User
-from ..schemas import InvoiceCreate
+from ..models import Category, Manufacturer, Store, Supplier, Patient, Invoice, StockInventory, Product, InvoiceItem, RegulatoryLog, User, Role
+from ..schemas import InvoiceCreate, RoleResponse
 from ..auth import get_db_with_tenant, get_current_tenant_user
 
 router = APIRouter()
@@ -149,7 +149,6 @@ def create_invoice(inv_in: InvoiceCreate, db: Session = Depends(get_db_with_tena
         db.flush()
         new_inv_id = new_inv.id
         db.commit()
-        # db.refresh(new_inv)
         
         # Restore tenant search path
         tenant_schema = db.info.get('tenant_schema')
@@ -157,6 +156,23 @@ def create_invoice(inv_in: InvoiceCreate, db: Session = Depends(get_db_with_tena
             db.execute(text(f"SET search_path TO {tenant_schema}, public"))
 
         new_inv = db.query(Invoice).filter(Invoice.id == new_inv_id).first()
+        
+        # Create accounting entry if Paid or Return
+        if inv_in.status in ["Paid", "Return"]:
+            try:
+                from ..services.accounting_service import AccountingService
+                
+                if inv_in.status == "Paid":
+                    AccountingService.record_sale_transaction(db, new_inv, user.id)
+                elif inv_in.status == "Return":
+                    AccountingService.record_return_transaction(db, new_inv, user.id)
+                
+                print(f"✓ Accounting entry created for invoice {new_inv.invoice_number}")
+            except Exception as acc_err:
+                # Log but don't fail the invoice creation
+                print(f"⚠ Warning: Failed to create accounting entry: {acc_err}")
+                traceback.print_exc()
+        
         return new_inv
     except Exception as e:
         db.rollback()
@@ -413,3 +429,7 @@ def update_settings(s: SettingsUpdate, db: Session = Depends(get_db_with_tenant)
     
     db.commit()
     return settings
+
+@router.get("/roles", response_model=List[RoleResponse])
+def list_roles(db: Session = Depends(get_db_with_tenant)):
+    return db.query(Role).all()

@@ -11,6 +11,7 @@ from .user_routes import router as user_router
 from .common_routes import router as common_router
 from .inventory_crud_routes import router as inventory_crud_router
 from .product_routes import router as product_router
+from .accounting_routes import router as accounting_router
 
 # Create main router
 api_router = APIRouter()
@@ -27,5 +28,8 @@ api_router.include_router(user_router, prefix="/users", tags=["Users"])
 api_router.include_router(common_router, tags=["Common"])
 api_router.include_router(inventory_crud_router, prefix="/inventory", tags=["Inventory CRUD"])
 api_router.include_router(product_router, prefix="/products", tags=["Products"])
+api_router.include_router(accounting_router)
+
 
 __all__ = ["api_router"]
+

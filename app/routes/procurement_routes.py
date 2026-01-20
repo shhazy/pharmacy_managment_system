@@ -307,6 +307,28 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
             db.execute(text(f"SET search_path TO {tenant_schema}, public"))
 
         db_grn = db.query(GRN).filter(GRN.id == grn_id).first()
+        
+        # 5. Create Accounting Entry
+        try:
+            from ..services.accounting_service import AccountingService
+            
+            # Update GRN with required fields for accounting
+            db_grn.grn_number = custom_grn_no
+            db_grn.received_date = grn_in.invoice_date or datetime.now().date()
+            db_grn.total_amount = db_grn.net_total
+            db_grn.status = "Received"
+            db.commit()
+            
+            # Create purchase journal entry
+            AccountingService.record_purchase_transaction(db, db_grn, user_id=None)
+            
+            print(f"✓ Accounting entry created for GRN {custom_grn_no}")
+        except Exception as acc_err:
+            # Log but don't fail the GRN creation
+            print(f"⚠ Warning: Failed to create accounting entry: {acc_err}")
+            import traceback
+            traceback.print_exc()
+        
         return db_grn
 
     except Exception as e:
@@ -316,6 +338,7 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
             f.write(traceback.format_exc())
             f.write("\\n" + "="*50 + "\\n")
         raise e
+
 
 @router.get("/grn", response_model=List[GRNResponse])
 def list_grns(

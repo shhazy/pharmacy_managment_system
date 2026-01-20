@@ -27,11 +27,37 @@ class InventoryItemUpdate(BaseModel):
 
 class InventoryItemResponse(BaseInventoryItem):
     id: int
-    created_by: Optional[int]
-    updated_by: Optional[int]
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
     created_at: datetime
     updated_at: datetime
-    is_active: bool
+    is_active: bool = True
+    
+    class Config:
+        from_attributes = True
+
+class SupplierCreate(BaseModel):
+    name: str
+    address: Optional[str] = None
+    gst_number: Optional[str] = None
+
+class SupplierUpdate(BaseModel):
+    name: Optional[str] = None
+    address: Optional[str] = None
+    gst_number: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class SupplierResponse(BaseModel):
+    id: int
+    name: str
+    address: Optional[str] = None
+    gst_number: Optional[str] = None
+    ledger_balance: float = 0.0
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
+    is_active: bool = True
     
     class Config:
         from_attributes = True
@@ -161,7 +187,7 @@ create_crud_routes(Manufacturer, "manufacturers", InventoryItemCreate, Inventory
 create_crud_routes(Rack, "racks", InventoryItemCreate, InventoryItemUpdate, InventoryItemResponse)
 
 # ============ SUPPLIERS ============
-create_crud_routes(Supplier, "suppliers", InventoryItemCreate, InventoryItemUpdate, InventoryItemResponse)
+create_crud_routes(Supplier, "suppliers", SupplierCreate, SupplierUpdate, SupplierResponse)
 
 # ============ PURCHASE CONVERSION UNITS ============
 create_crud_routes(PurchaseConversionUnit, "purchase-conversion-units", InventoryItemCreate, InventoryItemUpdate, InventoryItemResponse)

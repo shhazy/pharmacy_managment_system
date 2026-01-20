@@ -31,6 +31,3 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db_with_tenant), 
     new_u = db.query(User).filter(User.id == new_u_id).first()
     return new_u
 
-@router.get("/roles", response_model=List[RoleResponse])
-def list_roles(db: Session = Depends(get_db_with_tenant)):
-    return db.query(Role).all()
