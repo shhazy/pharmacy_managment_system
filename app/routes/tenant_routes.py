@@ -117,39 +117,46 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
             from ..models.accounting_models import Account, AccountType
             
             default_accounts = [
-                # ASSETS (1000-1999)
-                {"code": "1000", "name": "Cash", "type": AccountType.ASSET, "parent": None},
-                {"code": "1100", "name": "Bank Account", "type": AccountType.ASSET, "parent": None},
-                {"code": "1200", "name": "Accounts Receivable", "type": AccountType.ASSET, "parent": None},
-                {"code": "1300", "name": "Inventory", "type": AccountType.ASSET, "parent": None},
-                {"code": "1400", "name": "Prepaid Expenses", "type": AccountType.ASSET, "parent": None},
-                {"code": "1500", "name": "Fixed Assets", "type": AccountType.ASSET, "parent": None},
+                # ROOTS
+                {"code": "1", "name": "Assets", "type": AccountType.ASSET, "parent": None},
+                {"code": "2", "name": "Liabilities", "type": AccountType.LIABILITY, "parent": None},
+                {"code": "3", "name": "Equity", "type": AccountType.EQUITY, "parent": None},
+                {"code": "4", "name": "Revenue", "type": AccountType.REVENUE, "parent": None},
+                {"code": "5", "name": "Expenses", "type": AccountType.EXPENSE, "parent": None},
+
+                # ASSETS (Children of 1)
+                {"code": "1000", "name": "Cash", "type": AccountType.ASSET, "parent": "1"},
+                {"code": "1100", "name": "Bank Account", "type": AccountType.ASSET, "parent": "1"},
+                {"code": "1200", "name": "Accounts Receivable", "type": AccountType.ASSET, "parent": "1"},
+                {"code": "1300", "name": "Inventory", "type": AccountType.ASSET, "parent": "1"},
+                {"code": "1400", "name": "Prepaid Expenses", "type": AccountType.ASSET, "parent": "1"},
+                {"code": "1500", "name": "Fixed Assets", "type": AccountType.ASSET, "parent": "1"},
                 {"code": "1510", "name": "Furniture & Fixtures", "type": AccountType.ASSET, "parent": "1500"},
                 {"code": "1520", "name": "Equipment", "type": AccountType.ASSET, "parent": "1500"},
                 
-                # LIABILITIES (2000-2999)
-                {"code": "2000", "name": "Accounts Payable", "type": AccountType.LIABILITY, "parent": None},
-                {"code": "2100", "name": "Salaries Payable", "type": AccountType.LIABILITY, "parent": None},
-                {"code": "2200", "name": "Tax Payable", "type": AccountType.LIABILITY, "parent": None},
-                {"code": "2300", "name": "Short-term Loans", "type": AccountType.LIABILITY, "parent": None},
+                # LIABILITIES (Children of 2)
+                {"code": "2000", "name": "Accounts Payable", "type": AccountType.LIABILITY, "parent": "2"},
+                {"code": "2100", "name": "Salaries Payable", "type": AccountType.LIABILITY, "parent": "2"},
+                {"code": "2200", "name": "Tax Payable", "type": AccountType.LIABILITY, "parent": "2"},
+                {"code": "2300", "name": "Short-term Loans", "type": AccountType.LIABILITY, "parent": "2"},
                 
-                # EQUITY (3000-3999)
-                {"code": "3000", "name": "Owner's Capital", "type": AccountType.EQUITY, "parent": None},
-                {"code": "3100", "name": "Retained Earnings", "type": AccountType.EQUITY, "parent": None},
-                {"code": "3200", "name": "Drawings", "type": AccountType.EQUITY, "parent": None},
+                # EQUITY (Children of 3)
+                {"code": "3000", "name": "Owner's Capital", "type": AccountType.EQUITY, "parent": "3"},
+                {"code": "3100", "name": "Retained Earnings", "type": AccountType.EQUITY, "parent": "3"},
+                {"code": "3200", "name": "Drawings", "type": AccountType.EQUITY, "parent": "3"},
                 
-                # REVENUE (4000-4999)
-                {"code": "4000", "name": "Sales Revenue", "type": AccountType.REVENUE, "parent": None},
-                {"code": "4100", "name": "Other Income", "type": AccountType.REVENUE, "parent": None},
+                # REVENUE (Children of 4)
+                {"code": "4000", "name": "Sales Revenue", "type": AccountType.REVENUE, "parent": "4"},
+                {"code": "4100", "name": "Other Income", "type": AccountType.REVENUE, "parent": "4"},
                 
-                # EXPENSES (5000-5999)
-                {"code": "5000", "name": "Cost of Goods Sold", "type": AccountType.EXPENSE, "parent": None},
-                {"code": "5100", "name": "Salaries Expense", "type": AccountType.EXPENSE, "parent": None},
-                {"code": "5200", "name": "Rent Expense", "type": AccountType.EXPENSE, "parent": None},
-                {"code": "5300", "name": "Utilities Expense", "type": AccountType.EXPENSE, "parent": None},
-                {"code": "5400", "name": "Discount Given", "type": AccountType.EXPENSE, "parent": None},
-                {"code": "5500", "name": "Other Expenses", "type": AccountType.EXPENSE, "parent": None},
-                {"code": "5600", "name": "Depreciation Expense", "type": AccountType.EXPENSE, "parent": None},
+                # EXPENSES (Children of 5)
+                {"code": "5000", "name": "Cost of Goods Sold", "type": AccountType.EXPENSE, "parent": "5"},
+                {"code": "5100", "name": "Salaries Expense", "type": AccountType.EXPENSE, "parent": "5"},
+                {"code": "5200", "name": "Rent Expense", "type": AccountType.EXPENSE, "parent": "5"},
+                {"code": "5300", "name": "Utilities Expense", "type": AccountType.EXPENSE, "parent": "5"},
+                {"code": "5400", "name": "Discount Given", "type": AccountType.EXPENSE, "parent": "5"},
+                {"code": "5500", "name": "Other Expenses", "type": AccountType.EXPENSE, "parent": "5"},
+                {"code": "5600", "name": "Depreciation Expense", "type": AccountType.EXPENSE, "parent": "5"},
             ]
             
             # Create account code to ID mapping for parent relationships
