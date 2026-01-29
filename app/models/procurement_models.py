@@ -100,6 +100,7 @@ class GRNItem(Base):
     unit_cost = Column(Float)
     total_cost = Column(Float)
     retail_price = Column(Float)
+    foc_quantity = Column(Integer, default=0)
     
     purchase_conversion_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
     factor = Column(Integer, default=1)
@@ -168,6 +169,7 @@ class StockAdjustment(Base):
     
     status = Column(String(20), default="pending")  # 'pending', 'approved', 'rejected'
     
+    journal_entry_id = Column(Integer, ForeignKey("journal_entries.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

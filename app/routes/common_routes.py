@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func, text
 from datetime import datetime, timedelta
 from sqlalchemy.orm import joinedload
 from typing import List
 
-from ..models import Category, Manufacturer, Store, Supplier, Patient, Invoice, StockInventory, Product, InvoiceItem, RegulatoryLog, User, Role
+from ..models import Category, Manufacturer, Store, Supplier, Patient, Invoice, StockInventory, Product, InvoiceItem, RegulatoryLog, User, Role, PharmacySettings, AppSettings
 from ..schemas import InvoiceCreate, RoleResponse
 from ..auth import get_db_with_tenant, get_current_tenant_user
 
@@ -433,3 +434,31 @@ def update_settings(s: SettingsUpdate, db: Session = Depends(get_db_with_tenant)
 @router.get("/roles", response_model=List[RoleResponse])
 def list_roles(db: Session = Depends(get_db_with_tenant)):
     return db.query(Role).all()
+
+# --- APP SETTINGS ---
+
+class AppSettingsSchema(BaseModel):
+    default_listing_rows: int | None = 10
+
+@router.get("/app-settings")
+def get_app_settings(db: Session = Depends(get_db_with_tenant)):
+    settings = db.query(AppSettings).first()
+    if not settings:
+        # Create default if not exists
+        settings = AppSettings(default_listing_rows=10)
+        db.add(settings)
+        db.commit()
+    return settings
+
+@router.put("/app-settings")
+def update_app_settings(s: AppSettingsSchema, db: Session = Depends(get_db_with_tenant)):
+    settings = db.query(AppSettings).first()
+    if not settings:
+        settings = AppSettings()
+        db.add(settings)
+    
+    if s.default_listing_rows is not None:
+        settings.default_listing_rows = s.default_listing_rows
+    
+    db.commit()
+    return settings

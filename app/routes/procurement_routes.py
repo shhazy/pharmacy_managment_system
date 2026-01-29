@@ -4,20 +4,27 @@ from typing import List, Optional
 from datetime import datetime
 from sqlalchemy import func, text
 
-from ..models import PurchaseOrder, PurchaseOrderItem, Product, Manufacturer, GRN, GRNItem
+from ..models import PurchaseOrder, PurchaseOrderItem, Product, Manufacturer, GRN, GRNItem, Invoice, InvoiceItem
 from ..schemas import (
     PurchaseOrderCreate, PurchaseOrderUpdate, PurchaseOrderResponse, 
     POGenerateRequest, POSuggestionItem,
     GRNCreate, GRNResponse
 )
 from ..auth import get_db_with_tenant
+from ..schemas.common_schemas import PaginatedResponse
+from ..utils.pagination import paginate
 
 router = APIRouter()
 
 from typing import List, Optional
 
-@router.get("/orders", response_model=List[PurchaseOrderResponse])
+@router.get("/orders", response_model=PaginatedResponse[PurchaseOrderResponse])
 def list_pos(
+    page: int = 1,
+    page_size: int = 10,
+    search: Optional[str] = None,
+    sort_by: str = "id",
+    order: str = "desc",
     supplier_id: Optional[int] = None,
     status: Optional[str] = None,
     db: Session = Depends(get_db_with_tenant)
@@ -30,8 +37,32 @@ def list_pos(
         query = query.filter(PurchaseOrder.supplier_id == supplier_id)
     if status:
         query = query.filter(PurchaseOrder.status == status)
+    
+    if search:
+        query = query.filter(
+            (PurchaseOrder.po_no.ilike(f"%{search}%")) |
+            (PurchaseOrder.reference_no.ilike(f"%{search}%"))
+        )
         
-    return query.order_by(PurchaseOrder.created_at.desc()).all()
+    # Sorting
+    if sort_by and hasattr(PurchaseOrder, sort_by):
+        column = getattr(PurchaseOrder, sort_by)
+        if order == "asc":
+            query = query.order_by(column.asc())
+        else:
+            query = query.order_by(column.desc())
+    else:
+        query = query.order_by(PurchaseOrder.created_at.desc())
+        
+    items, total, total_pages = paginate(query, page, page_size)
+    
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages
+    }
 
 @router.get("/orders/{order_id}", response_model=PurchaseOrderResponse)
 def get_po(order_id: int, db: Session = Depends(get_db_with_tenant)):
@@ -45,8 +76,8 @@ def get_po(order_id: int, db: Session = Depends(get_db_with_tenant)):
 @router.post("/orders", response_model=PurchaseOrderResponse)
 def create_po(po_in: PurchaseOrderCreate, db: Session = Depends(get_db_with_tenant)):
     try:
-        # Generate PO number
-        po_no = f"PO-{datetime.now().strftime('%y%m%d%H%M%S')}"
+        # Generate PO number with milliseconds to avoid duplicates
+        po_no = f"PO-{datetime.now().strftime('%y%m%d%H%M%S%f')[:16]}"
         
         db_po = PurchaseOrder(
             po_no=po_no,
@@ -137,9 +168,12 @@ def delete_po(order_id: int, db: Session = Depends(get_db_with_tenant)):
 @router.post("/generate", response_model=List[POSuggestionItem])
 def generate_suggestions(req: POGenerateRequest, db: Session = Depends(get_db_with_tenant)):
     try:
-        from ..models import StockInventory
-        # Fetch products for the supplier with joinedload for efficiency
-        products = db.query(Product).options(joinedload(Product.manufacturer)).filter(Product.supplier_id == req.supplier_id).all()
+        from ..models import StockInventory, ProductSupplier
+        # Fetch products for the suppliers with joinedload for efficiency
+        # We search in both primary supplier_id and secondary product_suppliers table
+        products = db.query(Product).options(joinedload(Product.manufacturer)).outerjoin(ProductSupplier).filter(
+            (Product.supplier_id.in_(req.supplier_ids)) | (ProductSupplier.supplier_id.in_(req.supplier_ids))
+        ).distinct().all()
         suggestions = []
         
         for p in products:
@@ -156,25 +190,41 @@ def generate_suggestions(req: POGenerateRequest, db: Session = Depends(get_db_wi
             suggested_qty = 0
             if req.method == 'min':
                 suggested_qty = max(0, (p.min_inventory_level or 0) - current_stock - pending_qty)
+                print(f"Product {p.id} MIN: min_level={p.min_inventory_level}, current={current_stock}, pending={pending_qty}, suggested={suggested_qty}")
             elif req.method == 'optimal':
                 suggested_qty = max(0, (p.optimal_inventory_level or 0) - current_stock - pending_qty)
+                print(f"Product {p.id} OPTIMAL: optimal_level={p.optimal_inventory_level}, current={current_stock}, pending={pending_qty}, suggested={suggested_qty}")
             elif req.method == 'max':
                 suggested_qty = max(0, (p.max_inventory_level or 0) - current_stock - pending_qty)
+                print(f"Product {p.id} MAX: max_level={p.max_inventory_level}, current={current_stock}, pending={pending_qty}, suggested={suggested_qty}")
             elif req.method == 'sale' and req.sale_start_date and req.sale_end_date:
-                days = (req.sale_end_date - req.sale_start_date).days or 1
-                suggested_qty = max(0, (days // 2) - current_stock - pending_qty)
+                # Sales Based: Quantity = Total Quantity Sold in period
+                # We do NOT subtract stock for this method as per user request ("quantity will be equal to item sold")
+                sold_qty = db.query(func.sum(InvoiceItem.quantity)).join(Invoice).filter(
+                    InvoiceItem.medicine_id == p.id,
+                    Invoice.created_at >= req.sale_start_date,
+                    Invoice.created_at <= req.sale_end_date
+                ).scalar() or 0
+                suggested_qty = sold_qty
                 
-            if suggested_qty > 0 or req.method == 'none':
-                suggestions.append(POSuggestionItem(
-                    product_id=p.id,
-                    product_name=p.product_name,
-                    product_code=str(p.id), # Product code is removed, using ID as fallback
-                    current_stock=current_stock,
-                    suggested_qty=suggested_qty,
-                    cost_price=p.average_cost or 0.0,
-                    manufacturer=p.manufacturer.name if p.manufacturer else "Unknown",
-                    purchase_conv_unit_id=p.purchase_conv_unit_id
-                ))
+            # Always include the product in suggestions, even if qty is 0
+            # Map to the most relevant selected supplier
+            target_sup_id = p.supplier_id if p.supplier_id in req.supplier_ids else None
+            if not target_sup_id:
+                match = next((ps.supplier_id for ps in (p.product_suppliers or []) if ps.supplier_id in req.supplier_ids), None)
+                target_sup_id = match or p.supplier_id
+
+            suggestions.append(POSuggestionItem(
+                product_id=p.id,
+                product_name=p.product_name,
+                product_code=str(p.id),
+                current_stock=current_stock,
+                suggested_qty=suggested_qty,
+                cost_price=p.average_cost or 0.0,
+                manufacturer=p.manufacturer.name if p.manufacturer else "Unknown",
+                purchase_conv_unit_id=p.purchase_conv_unit_id,
+                supplier_id=target_sup_id
+            ))
                 
         return suggestions
     except Exception as e:
@@ -242,6 +292,9 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
             calculated_sub_total += item.total_cost
             
             # --- Inventory & Cost Logic ---
+            total_units_received = item.quantity + item.foc_quantity
+            landed_unit_cost = item.total_cost / total_units_received if total_units_received > 0 else 0
+            
             product = db.query(Product).get(item.product_id)
             if product:
                 # ✅ CREATE STOCK_INVENTORY ENTRY
@@ -252,8 +305,8 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
                     product_id=item.product_id,
                     batch_number=item.batch_no,
                     expiry_date=item.expiry_date,
-                    quantity=item.quantity,
-                    unit_cost=item.unit_cost,
+                    quantity=total_units_received,
+                    unit_cost=landed_unit_cost,
                     selling_price=item.retail_price,
                     warehouse_location=None,  # Can be set later or from GRN input
                     supplier_id=grn_in.supplier_id,
@@ -277,7 +330,7 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
                 
                 current_value = total_stock * old_avg
                 new_value = item.total_cost
-                new_total_qty = total_stock + item.quantity
+                new_total_qty = total_stock + total_units_received
                 
                 if new_total_qty > 0:
                     product.average_cost = (current_value + new_value) / new_total_qty
@@ -312,13 +365,6 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
         try:
             from ..services.accounting_service import AccountingService
             
-            # Update GRN with required fields for accounting
-            db_grn.grn_number = custom_grn_no
-            db_grn.received_date = grn_in.invoice_date or datetime.now().date()
-            db_grn.total_amount = db_grn.net_total
-            db_grn.status = "Received"
-            db.commit()
-            
             # Create purchase journal entry
             AccountingService.record_purchase_transaction(db, db_grn, user_id=None)
             
@@ -340,8 +386,13 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
         raise e
 
 
-@router.get("/grn", response_model=List[GRNResponse])
+@router.get("/grn", response_model=PaginatedResponse[GRNResponse])
 def list_grns(
+    page: int = 1,
+    page_size: int = 10,
+    search: Optional[str] = None,
+    sort_by: str = "id",
+    order: str = "desc",
     supplier_id: Optional[int] = None,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
@@ -355,5 +406,29 @@ def list_grns(
         query = query.filter(GRN.created_at >= start_date)
     if end_date:
         query = query.filter(GRN.created_at <= end_date)
+    
+    if search:
+        query = query.filter(
+            (GRN.custom_grn_no.ilike(f"%{search}%")) |
+            (GRN.invoice_no.ilike(f"%{search}%"))
+        )
+
+    # Sorting
+    if sort_by and hasattr(GRN, sort_by):
+        column = getattr(GRN, sort_by)
+        if order == "asc":
+            query = query.order_by(column.asc())
+        else:
+            query = query.order_by(column.desc())
+    else:
+        query = query.order_by(GRN.created_at.desc())
         
-    return query.order_by(GRN.created_at.desc()).all()
+    items, total, total_pages = paginate(query, page, page_size)
+    
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages
+    }

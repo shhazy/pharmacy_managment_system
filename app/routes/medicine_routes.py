@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import text
+from sqlalchemy import text, func
 
 from ..models import Product, ProductIngredient, ProductSupplier, ProductHistory, StockInventory, User
 from ..schemas import MedicineCreate
@@ -11,33 +11,42 @@ router = APIRouter()
 @router.get("/search")
 def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
     from sqlalchemy import or_, func
+    from sqlalchemy.orm import joinedload, aliased
     from ..models.procurement_models import StockInventory
     from ..models.pharmacy_models import Product, Category, Manufacturer
-    from ..models.inventory_models import Generic
+    from ..models.inventory_models import Generic, PurchaseConversionUnit
     
+    # Aliases for different unit joins
+    PurchaseUnit = aliased(PurchaseConversionUnit)
+    PosUnit = aliased(PurchaseConversionUnit)
+
     results = db.query(
             Product, 
             func.sum(StockInventory.quantity).label("current_stock"),
             Category.name.label("category_name"),
             Manufacturer.name.label("manufacturer_name"),
-            Generic.name.label("generic_name")
+            Generic.name.label("generic_name"),
+            PurchaseUnit.name.label("purchase_unit_name"),
+            PosUnit.name.label("pos_unit_name")
         )\
         .outerjoin(StockInventory, Product.id == StockInventory.product_id)\
         .outerjoin(Category, Product.category_id == Category.id)\
         .outerjoin(Manufacturer, Product.manufacturer_id == Manufacturer.id)\
         .outerjoin(Generic, Product.generics_id == Generic.id)\
+        .outerjoin(PurchaseUnit, Product.purchase_conv_unit_id == PurchaseUnit.id)\
+        .outerjoin(PosUnit, Product.preferred_pos_unit_id == PosUnit.id)\
         .options(joinedload(Product.stock_inventory))\
         .filter(
             or_(
                 Product.product_name.ilike(f"%{q}%")
             )
         )\
-        .group_by(Product.id, Category.name, Manufacturer.name, Generic.name)\
+        .group_by(Product.id, Category.name, Manufacturer.name, Generic.name, PurchaseUnit.name, PosUnit.name)\
         .all()
     
     # Map to list of dicts or enhanced objects
     response = []
-    for product, stock, cat_name, man_name, gen_name in results:
+    for product, stock, cat_name, man_name, gen_name, p_unit_name, pos_unit_name in results:
         p_dict = {
             "id": product.id,
             "product_name": product.product_name,
@@ -49,6 +58,11 @@ def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
             "manufacturer_id": product.manufacturer_id,
             "category": {"id": product.category_id, "name": cat_name or "Uncategorized"},
             "manufacturer": {"id": product.manufacturer_id, "name": man_name or "N/A"},
+            "uom": pos_unit_name or "Unit", # Base unit name from POS Unit
+            "purchase_conv_unit_id": product.purchase_conv_unit_id,
+            "purchase_conv_unit_name": p_unit_name, # Also providing this if needed
+            "purchase_conv_factor": product.purchase_conv_factor,
+            "preferred_purchase_unit_id": product.preferred_purchase_unit_id,
             "stock_inventory": [
                 {
                     "inventory_id": s.inventory_id,
@@ -75,9 +89,17 @@ def get_product_details(id: int, db: Session = Depends(get_db_with_tenant)):
 
 @router.post("/")
 def add_product(med: MedicineCreate, db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):
+    # Manual uniqueness check (trimmed and case-insensitive)
+    name_val = med.name or med.product_name if hasattr(med, 'product_name') else med.name
+    name_clean = name_val.strip()
+    
+    existing = db.query(Product).filter(func.lower(func.trim(Product.product_name)) == name_clean.lower()).first()
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Product with name '{name_clean}' already exists.")
+
     # 1. Creation
     new_m = Product(
-        product_name=med.name or med.product_name if hasattr(med, 'product_name') else med.name,
+        product_name=name_clean,
         category_id=med.category_id, 
         sub_category_id=getattr(med, 'sub_category_id', None),
         product_group_id=getattr(med, 'product_group_id', None),

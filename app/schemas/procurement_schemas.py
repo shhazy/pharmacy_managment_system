@@ -20,6 +20,8 @@ class ProductSimplified(BaseModel):
     retail_price: Optional[float] = 0.0
     purchase_conv_unit_id: Optional[int] = None
     purchase_conv_factor: Optional[int] = 1
+    uom: Optional[str] = None
+    purchase_conv_unit_name: Optional[str] = None
 
 class PurchaseOrderItemResponse(PurchaseOrderItemBase):
     id: int
@@ -65,7 +67,7 @@ class PurchaseOrderResponse(PurchaseOrderBase):
         from_attributes = True
 
 class POGenerateRequest(BaseModel):
-    supplier_id: int
+    supplier_ids: List[int]
     method: str  # min, optimal, max, sale, none
     sale_start_date: Optional[datetime] = None
     sale_end_date: Optional[datetime] = None
@@ -79,6 +81,7 @@ class POSuggestionItem(BaseModel):
     cost_price: float
     manufacturer: str
     purchase_conv_unit_id: Optional[int] = None
+    supplier_id: Optional[int] = None
 
 # --- GRN Schemas ---
 class GRNItemCreate(BaseModel):
@@ -90,6 +93,7 @@ class GRNItemCreate(BaseModel):
     unit_cost: float
     total_cost: float
     retail_price: float
+    foc_quantity: int = 0
     purchase_conversion_unit_id: Optional[int] = None
     factor: int = 1
 
@@ -123,3 +127,30 @@ class GRNResponse(GRNCreate):
 
     class Config:
         orm_mode = True
+
+# --- Stock Adjustment Schemas ---
+class StockAdjustmentCreate(BaseModel):
+    product_id: int
+    inventory_id: Optional[int] = None
+    batch_number: Optional[str] = None
+    adjustment_type: str  # physical_count, damage, expiry, theft, etc.
+    quantity_adjusted: float
+    reason: Optional[str] = None
+    reference_number: Optional[str] = None
+
+class StockAdjustmentResponse(BaseModel):
+    adjustment_id: int
+    product_id: int
+    batch_number: Optional[str] = None
+    inventory_id: Optional[int] = None
+    adjustment_type: str
+    quantity_adjusted: float
+    previous_quantity: Optional[float] = None
+    new_quantity: Optional[float] = None
+    reason: Optional[str] = None
+    reference_number: Optional[str] = None
+    adjustment_date: datetime
+    status: str
+    
+    class Config:
+        from_attributes = True

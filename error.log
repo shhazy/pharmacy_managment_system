@@ -935,3 +935,624 @@ LINE 1: ...uantity, unit_cost, discount_percent, total_cost, purchase_c...
 (Background on this error at: https://sqlalche.me/e/20/f405)
 
 ==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260123110758) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260123110758', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 23, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 23, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 500.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 500.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 23, 6, 7, 58, 354356)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260123110758) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260123110758) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260123110758', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 23, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 23, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 500.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 500.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 23, 6, 7, 58, 354356)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135318) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135318', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Pending', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 18, 981986)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135318) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135318) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135318', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Pending', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 18, 981986)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135324) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135324', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 24, 759377)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135324) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135324) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135324', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 24, 759377)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135334) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135334', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 34, 612301)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135334) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135334) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135334', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 34, 612301)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135344) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135344', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Pending', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 44, 981030)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135344) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135344) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135344', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 0.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 0.0, 'status': 'Pending', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 53, 44, 981030)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135948) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135948', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 6000.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 6000.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 59, 48, 881238)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135948) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126135948) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126135948', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 6000.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 6000.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 8, 59, 48, 881238)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating PO: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126150649) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126150649', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 6000.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 6000.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 10, 6, 49, 921148)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126150649) already exists.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 65, in create_po
+    db.flush() # Flush to get ID
+    ^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1227, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_purchase_orders_po_no"
+DETAIL:  Key (po_no)=(PO-260126150649) already exists.
+
+[SQL: INSERT INTO purchase_orders (po_no, reference_no, supplier_id, issue_date, delivery_date, sub_total, total_tax, total_discount, total_amount, status, notes, created_at) VALUES (%(po_no)s, %(reference_no)s, %(supplier_id)s, %(issue_date)s, %(delivery_date)s, %(sub_total)s, %(total_tax)s, %(total_discount)s, %(total_amount)s, %(status)s, %(notes)s, %(created_at)s) RETURNING purchase_orders.id]
+[parameters: {'po_no': 'PO-260126150649', 'reference_no': '', 'supplier_id': 2, 'issue_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'delivery_date': datetime.datetime(2026, 1, 26, 0, 0, tzinfo=TzInfo(UTC)), 'sub_total': 6000.0, 'total_tax': 0.0, 'total_discount': 0.0, 'total_amount': 6000.0, 'status': 'Finalized', 'notes': 'Bulked planned via multi-supplier tool. ', 'created_at': datetime.datetime(2026, 1, 26, 10, 6, 49, 921148)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+==================================================
+Error creating GRN: (psycopg2.errors.UndefinedColumn) column "foc_quantity" of relation "grn_items" does not exist
+LINE 1: ...e, quantity, unit_cost, total_cost, retail_price, foc_quanti...
+                                                             ^
+
+[SQL: INSERT INTO grn_items (grn_id, product_id, batch_no, expiry_date, pack_size, quantity, unit_cost, total_cost, retail_price, foc_quantity, purchase_conversion_unit_id, factor) SELECT p0::INTEGER, p1::INTEGER, p2::VARCHAR, p3::TIMESTAMP WITHOUT TIME ZO ... 2084 characters truncated ... 7, p8, p9, p10, p11, sen_counter) ORDER BY sen_counter RETURNING grn_items.id, grn_items.id AS id__1]
+[parameters: {'batch_no__0': 'test', 'purchase_conversion_unit_id__0': 1, 'factor__0': 10, 'retail_price__0': 0.0, 'expiry_date__0': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__0': 1, 'foc_quantity__0': 10, 'product_id__0': 5, 'unit_cost__0': 10.0, 'quantity__0': 100, 'grn_id__0': 2, 'total_cost__0': 1000.0, 'batch_no__1': 'DEFAULT', 'purchase_conversion_unit_id__1': 1, 'factor__1': 12, 'retail_price__1': 600.0, 'expiry_date__1': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__1': 1, 'foc_quantity__1': 0, 'product_id__1': 3, 'unit_cost__1': 500.0, 'quantity__1': 12, 'grn_id__1': 2, 'total_cost__1': 6000.0, 'batch_no__2': 'DEFAULT', 'purchase_conversion_unit_id__2': None, 'factor__2': 1, 'retail_price__2': 0.0, 'expiry_date__2': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__2': 1, 'foc_quantity__2': 0, 'product_id__2': 12, 'unit_cost__2': 0.0, 'quantity__2': 1, 'grn_id__2': 2, 'total_cost__2': 0.0, 'batch_no__3': 'DEFAULT', 'purchase_conversion_unit_id__3': 3, 'factor__3': 12, 'retail_price__3': 600.0, 'expiry_date__3': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__3': 1, 'foc_quantity__3': 0, 'product_id__3': 2, 'unit_cost__3': 500.0, 'quantity__3': 12, 'grn_id__3': 2, 'total_cost__3': 6000.0, 'batch_no__4': 'DEFAULT', 'purchase_conversion_unit_id__4': None, 'factor__4': 1, 'retail_price__4': 0.0, 'expiry_date__4': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__4': 1, 'foc_quantity__4': 0, 'product_id__4': 13, 'unit_cost__4': 0.0, 'quantity__4': 1, 'grn_id__4': 2, 'total_cost__4': 0.0, 'batch_no__5': 'DEFAULT', 'purchase_conversion_unit_id__5': 1, 'factor__5': 20, 'retail_price__5': 0.0, 'expiry_date__5': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__5': 1, 'foc_quantity__5': 0, 'product_id__5': 8, 'unit_cost__5': 0.0, 'quantity__5': 20, 'grn_id__5': 2, 'total_cost__5': 0.0, 'batch_no__6': 'DEFAULT', 'purchase_conversion_unit_id__6': 1, 'factor__6': 10, 'retail_price__6': 10.0, 'expiry_date__6': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__6': 1, 'foc_quantity__6': 0, 'product_id__6': 1, 'unit_cost__6': 8.0, 'quantity__6': 10, 'grn_id__6': 2, 'total_cost__6': 80.0, 'batch_no__7': 'DEFAULT', 'purchase_conversion_unit_id__7': None, 'factor__7': 1, 'retail_price__7': 0.0, 'expiry_date__7': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__7': 1, 'foc_quantity__7': 0, 'product_id__7': 14, 'unit_cost__7': 0.0, 'quantity__7': 1, 'grn_id__7': 2, 'total_cost__7': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column "foc_quantity" of relation "grn_items" does not exist
+LINE 1: ...e, quantity, unit_cost, total_cost, retail_price, foc_quanti...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 354, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1137, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_insertmany_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2121, in _exec_insertmany_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "foc_quantity" of relation "grn_items" does not exist
+LINE 1: ...e, quantity, unit_cost, total_cost, retail_price, foc_quanti...
+                                                             ^
+
+[SQL: INSERT INTO grn_items (grn_id, product_id, batch_no, expiry_date, pack_size, quantity, unit_cost, total_cost, retail_price, foc_quantity, purchase_conversion_unit_id, factor) SELECT p0::INTEGER, p1::INTEGER, p2::VARCHAR, p3::TIMESTAMP WITHOUT TIME ZO ... 2084 characters truncated ... 7, p8, p9, p10, p11, sen_counter) ORDER BY sen_counter RETURNING grn_items.id, grn_items.id AS id__1]
+[parameters: {'batch_no__0': 'test', 'purchase_conversion_unit_id__0': 1, 'factor__0': 10, 'retail_price__0': 0.0, 'expiry_date__0': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__0': 1, 'foc_quantity__0': 10, 'product_id__0': 5, 'unit_cost__0': 10.0, 'quantity__0': 100, 'grn_id__0': 2, 'total_cost__0': 1000.0, 'batch_no__1': 'DEFAULT', 'purchase_conversion_unit_id__1': 1, 'factor__1': 12, 'retail_price__1': 600.0, 'expiry_date__1': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__1': 1, 'foc_quantity__1': 0, 'product_id__1': 3, 'unit_cost__1': 500.0, 'quantity__1': 12, 'grn_id__1': 2, 'total_cost__1': 6000.0, 'batch_no__2': 'DEFAULT', 'purchase_conversion_unit_id__2': None, 'factor__2': 1, 'retail_price__2': 0.0, 'expiry_date__2': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__2': 1, 'foc_quantity__2': 0, 'product_id__2': 12, 'unit_cost__2': 0.0, 'quantity__2': 1, 'grn_id__2': 2, 'total_cost__2': 0.0, 'batch_no__3': 'DEFAULT', 'purchase_conversion_unit_id__3': 3, 'factor__3': 12, 'retail_price__3': 600.0, 'expiry_date__3': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__3': 1, 'foc_quantity__3': 0, 'product_id__3': 2, 'unit_cost__3': 500.0, 'quantity__3': 12, 'grn_id__3': 2, 'total_cost__3': 6000.0, 'batch_no__4': 'DEFAULT', 'purchase_conversion_unit_id__4': None, 'factor__4': 1, 'retail_price__4': 0.0, 'expiry_date__4': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__4': 1, 'foc_quantity__4': 0, 'product_id__4': 13, 'unit_cost__4': 0.0, 'quantity__4': 1, 'grn_id__4': 2, 'total_cost__4': 0.0, 'batch_no__5': 'DEFAULT', 'purchase_conversion_unit_id__5': 1, 'factor__5': 20, 'retail_price__5': 0.0, 'expiry_date__5': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__5': 1, 'foc_quantity__5': 0, 'product_id__5': 8, 'unit_cost__5': 0.0, 'quantity__5': 20, 'grn_id__5': 2, 'total_cost__5': 0.0, 'batch_no__6': 'DEFAULT', 'purchase_conversion_unit_id__6': 1, 'factor__6': 10, 'retail_price__6': 10.0, 'expiry_date__6': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__6': 1, 'foc_quantity__6': 0, 'product_id__6': 1, 'unit_cost__6': 8.0, 'quantity__6': 10, 'grn_id__6': 2, 'total_cost__6': 80.0, 'batch_no__7': 'DEFAULT', 'purchase_conversion_unit_id__7': None, 'factor__7': 1, 'retail_price__7': 0.0, 'expiry_date__7': datetime.datetime(2026, 1, 27, 12, 47, 7, 398000, tzinfo=TzInfo(UTC)), 'pack_size__7': 1, 'foc_quantity__7': 0, 'product_id__7': 14, 'unit_cost__7': 0.0, 'quantity__7': 1, 'grn_id__7': 2, 'total_cost__7': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+\n==================================================\nError creating GRN: (psycopg2.errors.UndefinedColumn) column "foc_quantity" of relation "grn_items" does not exist
+LINE 1: ...e, quantity, unit_cost, total_cost, retail_price, foc_quanti...
+                                                             ^
+
+[SQL: INSERT INTO grn_items (grn_id, product_id, batch_no, expiry_date, pack_size, quantity, unit_cost, total_cost, retail_price, foc_quantity, purchase_conversion_unit_id, factor) SELECT p0::INTEGER, p1::INTEGER, p2::VARCHAR, p3::TIMESTAMP WITHOUT TIME ZO ... 2084 characters truncated ... 7, p8, p9, p10, p11, sen_counter) ORDER BY sen_counter RETURNING grn_items.id, grn_items.id AS id__1]
+[parameters: {'batch_no__0': 'DEFAULT', 'purchase_conversion_unit_id__0': 1, 'factor__0': 10, 'retail_price__0': 15.0, 'expiry_date__0': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__0': 1, 'foc_quantity__0': 10, 'product_id__0': 5, 'unit_cost__0': 10.0, 'quantity__0': 100, 'grn_id__0': 3, 'total_cost__0': 1000.0, 'batch_no__1': 'DEFAULT', 'purchase_conversion_unit_id__1': 1, 'factor__1': 12, 'retail_price__1': 600.0, 'expiry_date__1': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__1': 1, 'foc_quantity__1': 0, 'product_id__1': 3, 'unit_cost__1': 500.0, 'quantity__1': 12, 'grn_id__1': 3, 'total_cost__1': 6000.0, 'batch_no__2': 'DEFAULT', 'purchase_conversion_unit_id__2': None, 'factor__2': 1, 'retail_price__2': 0.0, 'expiry_date__2': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__2': 1, 'foc_quantity__2': 0, 'product_id__2': 12, 'unit_cost__2': 0.0, 'quantity__2': 1, 'grn_id__2': 3, 'total_cost__2': 0.0, 'batch_no__3': 'DEFAULT', 'purchase_conversion_unit_id__3': 3, 'factor__3': 12, 'retail_price__3': 600.0, 'expiry_date__3': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__3': 1, 'foc_quantity__3': 0, 'product_id__3': 2, 'unit_cost__3': 500.0, 'quantity__3': 12, 'grn_id__3': 3, 'total_cost__3': 6000.0, 'batch_no__4': 'DEFAULT', 'purchase_conversion_unit_id__4': None, 'factor__4': 1, 'retail_price__4': 0.0, 'expiry_date__4': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__4': 1, 'foc_quantity__4': 0, 'product_id__4': 13, 'unit_cost__4': 0.0, 'quantity__4': 1, 'grn_id__4': 3, 'total_cost__4': 0.0, 'batch_no__5': 'DEFAULT', 'purchase_conversion_unit_id__5': 1, 'factor__5': 20, 'retail_price__5': 0.0, 'expiry_date__5': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__5': 1, 'foc_quantity__5': 0, 'product_id__5': 8, 'unit_cost__5': 0.0, 'quantity__5': 20, 'grn_id__5': 3, 'total_cost__5': 0.0, 'batch_no__6': 'DEFAULT', 'purchase_conversion_unit_id__6': 1, 'factor__6': 10, 'retail_price__6': 10.0, 'expiry_date__6': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__6': 1, 'foc_quantity__6': 0, 'product_id__6': 1, 'unit_cost__6': 8.0, 'quantity__6': 10, 'grn_id__6': 3, 'total_cost__6': 80.0, 'batch_no__7': 'DEFAULT', 'purchase_conversion_unit_id__7': None, 'factor__7': 1, 'retail_price__7': 0.0, 'expiry_date__7': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__7': 1, 'foc_quantity__7': 0, 'product_id__7': 14, 'unit_cost__7': 0.0, 'quantity__7': 1, 'grn_id__7': 3, 'total_cost__7': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)\nTraceback (most recent call last):
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column "foc_quantity" of relation "grn_items" does not exist
+LINE 1: ...e, quantity, unit_cost, total_cost, retail_price, foc_quanti...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\dell\.gemini\antigravity\scratch\pharmacy_management_system\backend\app\routes\procurement_routes.py", line 354, in create_grn
+    db.commit()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4312, in flush
+    self._flush(objects)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 4408, in _flush
+    flush_context.execute()
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1137, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 517, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1843, in _execute_context
+    return self._exec_insertmany_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2121, in _exec_insertmany_context
+    self._handle_dbapi_exception(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2344, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2113, in _exec_insertmany_context
+    dialect.do_execute(
+  File "C:\Users\dell\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column "foc_quantity" of relation "grn_items" does not exist
+LINE 1: ...e, quantity, unit_cost, total_cost, retail_price, foc_quanti...
+                                                             ^
+
+[SQL: INSERT INTO grn_items (grn_id, product_id, batch_no, expiry_date, pack_size, quantity, unit_cost, total_cost, retail_price, foc_quantity, purchase_conversion_unit_id, factor) SELECT p0::INTEGER, p1::INTEGER, p2::VARCHAR, p3::TIMESTAMP WITHOUT TIME ZO ... 2084 characters truncated ... 7, p8, p9, p10, p11, sen_counter) ORDER BY sen_counter RETURNING grn_items.id, grn_items.id AS id__1]
+[parameters: {'batch_no__0': 'DEFAULT', 'purchase_conversion_unit_id__0': 1, 'factor__0': 10, 'retail_price__0': 15.0, 'expiry_date__0': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__0': 1, 'foc_quantity__0': 10, 'product_id__0': 5, 'unit_cost__0': 10.0, 'quantity__0': 100, 'grn_id__0': 3, 'total_cost__0': 1000.0, 'batch_no__1': 'DEFAULT', 'purchase_conversion_unit_id__1': 1, 'factor__1': 12, 'retail_price__1': 600.0, 'expiry_date__1': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__1': 1, 'foc_quantity__1': 0, 'product_id__1': 3, 'unit_cost__1': 500.0, 'quantity__1': 12, 'grn_id__1': 3, 'total_cost__1': 6000.0, 'batch_no__2': 'DEFAULT', 'purchase_conversion_unit_id__2': None, 'factor__2': 1, 'retail_price__2': 0.0, 'expiry_date__2': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__2': 1, 'foc_quantity__2': 0, 'product_id__2': 12, 'unit_cost__2': 0.0, 'quantity__2': 1, 'grn_id__2': 3, 'total_cost__2': 0.0, 'batch_no__3': 'DEFAULT', 'purchase_conversion_unit_id__3': 3, 'factor__3': 12, 'retail_price__3': 600.0, 'expiry_date__3': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__3': 1, 'foc_quantity__3': 0, 'product_id__3': 2, 'unit_cost__3': 500.0, 'quantity__3': 12, 'grn_id__3': 3, 'total_cost__3': 6000.0, 'batch_no__4': 'DEFAULT', 'purchase_conversion_unit_id__4': None, 'factor__4': 1, 'retail_price__4': 0.0, 'expiry_date__4': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__4': 1, 'foc_quantity__4': 0, 'product_id__4': 13, 'unit_cost__4': 0.0, 'quantity__4': 1, 'grn_id__4': 3, 'total_cost__4': 0.0, 'batch_no__5': 'DEFAULT', 'purchase_conversion_unit_id__5': 1, 'factor__5': 20, 'retail_price__5': 0.0, 'expiry_date__5': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__5': 1, 'foc_quantity__5': 0, 'product_id__5': 8, 'unit_cost__5': 0.0, 'quantity__5': 20, 'grn_id__5': 3, 'total_cost__5': 0.0, 'batch_no__6': 'DEFAULT', 'purchase_conversion_unit_id__6': 1, 'factor__6': 10, 'retail_price__6': 10.0, 'expiry_date__6': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__6': 1, 'foc_quantity__6': 0, 'product_id__6': 1, 'unit_cost__6': 8.0, 'quantity__6': 10, 'grn_id__6': 3, 'total_cost__6': 80.0, 'batch_no__7': 'DEFAULT', 'purchase_conversion_unit_id__7': None, 'factor__7': 1, 'retail_price__7': 0.0, 'expiry_date__7': datetime.datetime(2026, 1, 27, 12, 49, 2, 117000, tzinfo=TzInfo(UTC)), 'pack_size__7': 1, 'foc_quantity__7': 0, 'product_id__7': 14, 'unit_cost__7': 0.0, 'quantity__7': 1, 'grn_id__7': 3, 'total_cost__7': 0.0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+\n==================================================\n

@@ -3,7 +3,7 @@ from .auth_schemas import Token, LoginRequest
 from .tenant_schemas import TenantCreate, TenantResponse
 from .user_schemas import (
     PermissionResponse, RoleResponse, UserCreate, 
-    UserUpdate, UserResponse
+    UserUpdate, UserResponse, RoleCreate, RoleUpdate
 )
 from .pharmacy_schemas import (
     BatchBase, IngredientBase, ProductSupplierBase, 
@@ -25,6 +25,8 @@ __all__ = [
     "UserCreate",
     "UserUpdate",
     "UserResponse",
+    "RoleCreate",
+    "RoleUpdate",
     "BatchBase",
     "IngredientBase",
     "ProductSupplierBase",

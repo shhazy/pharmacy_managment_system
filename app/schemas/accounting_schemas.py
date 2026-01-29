@@ -296,6 +296,7 @@ class PurchaseRegisterItem(BaseModel):
     supplier_name: str
     invoice_number: Optional[str]
     amount: Decimal
+    advance_tax: Decimal = Decimal('0.00')
     payment_mode: str
 
 class PurchaseRegisterReport(BaseModel):

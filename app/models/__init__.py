@@ -4,7 +4,7 @@ from .public_models import Tenant, SuperAdmin
 from .user_models import User, Role, Permission, Store, user_roles, role_permissions
 from .pharmacy_models import (
     Manufacturer, Category, Product, ProductIngredient, 
-    ProductSupplier, ProductHistory, Supplier, PharmacySettings
+    ProductSupplier, ProductHistory, Supplier, PharmacySettings, AppSettings
 )
 from .procurement_models import PurchaseOrder, PurchaseOrderItem, StockTransfer, GRN, GRNItem, StockInventory, StockAdjustment
 from .sales_models import Patient, Prescription, Invoice, InvoiceItem, SalesReturn
@@ -65,4 +65,5 @@ __all__ = [
     "CustomerLedger",
     "PaymentVoucher",
     "ReceiptVoucher",
+    "AppSettings",
 ]

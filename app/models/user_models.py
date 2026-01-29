@@ -29,6 +29,8 @@ class Permission(Base):
     __tablename__ = "permissions"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
+    module = Column(String, index=True)
+    action = Column(String)  # create, read, update, delete
     description = Column(String)
 
 class Role(Base):

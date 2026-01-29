@@ -130,6 +130,7 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
                 {"code": "1200", "name": "Accounts Receivable", "type": AccountType.ASSET, "parent": "1"},
                 {"code": "1300", "name": "Inventory", "type": AccountType.ASSET, "parent": "1"},
                 {"code": "1400", "name": "Prepaid Expenses", "type": AccountType.ASSET, "parent": "1"},
+                {"code": "1450", "name": "Advance Tax Receivable", "type": AccountType.ASSET, "parent": "1"},
                 {"code": "1500", "name": "Fixed Assets", "type": AccountType.ASSET, "parent": "1"},
                 {"code": "1510", "name": "Furniture & Fixtures", "type": AccountType.ASSET, "parent": "1500"},
                 {"code": "1520", "name": "Equipment", "type": AccountType.ASSET, "parent": "1500"},

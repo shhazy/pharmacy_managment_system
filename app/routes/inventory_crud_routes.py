@@ -10,6 +10,8 @@ from ..models import (
     Generic, CalculateSeason, Manufacturer, Rack, Supplier, PurchaseConversionUnit, User
 )
 from ..auth import get_db_with_tenant, get_current_tenant_user
+from ..schemas.common_schemas import PaginatedResponse
+from ..utils.pagination import paginate
 
 router = APIRouter()
 
@@ -89,9 +91,39 @@ class SubCategoryResponse(BaseModel):
 def create_crud_routes(model_class, router_prefix: str, create_schema, update_schema, response_schema):
     """Generic function to create CRUD routes for a model"""
     
-    @router.get(f"/{router_prefix}", response_model=List[response_schema])
-    def list_items(db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):
-        return db.query(model_class).filter(model_class.is_active == True).all()
+    @router.get(f"/{router_prefix}", response_model=PaginatedResponse[response_schema])
+    def list_items(
+        page: int = 1, 
+        page_size: int = 10, 
+        search: Optional[str] = None,
+        sort_by: str = "id",
+        order: str = "desc",
+        db: Session = Depends(get_db_with_tenant), 
+        user: User = Depends(get_current_tenant_user)
+    ):
+        query = db.query(model_class).filter(model_class.is_active == True)
+        
+        if search:
+            query = query.filter(model_class.name.ilike(f"%{search}%"))
+            
+        if sort_by and hasattr(model_class, sort_by):
+            column = getattr(model_class, sort_by)
+            if order == "asc":
+                query = query.order_by(column.asc())
+            else:
+                query = query.order_by(column.desc())
+        else:
+            query = query.order_by(model_class.id.desc())
+            
+        items, total, total_pages = paginate(query, page, page_size)
+        
+        return {
+            "items": items,
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": total_pages
+        }
     
     @router.get(f"/{router_prefix}/all", response_model=List[response_schema])
     def list_all_items(db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):
@@ -194,9 +226,39 @@ create_crud_routes(PurchaseConversionUnit, "purchase-conversion-units", Inventor
 
 # ============ SUB CATEGORIES (Special handling due to foreign key) ============
 
-@router.get("/sub-categories", response_model=List[SubCategoryResponse])
-def list_sub_categories(db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):
-    return db.query(SubCategory).filter(SubCategory.is_active == True).all()
+@router.get("/sub-categories", response_model=PaginatedResponse[SubCategoryResponse])
+def list_sub_categories(
+    page: int = 1, 
+    page_size: int = 10, 
+    search: Optional[str] = None,
+    sort_by: str = "id",
+    order: str = "desc",
+    db: Session = Depends(get_db_with_tenant), 
+    user: User = Depends(get_current_tenant_user)
+):
+    query = db.query(SubCategory).filter(SubCategory.is_active == True)
+    
+    if search:
+        query = query.filter(SubCategory.name.ilike(f"%{search}%"))
+        
+    if sort_by and hasattr(SubCategory, sort_by):
+        column = getattr(SubCategory, sort_by)
+        if order == "asc":
+            query = query.order_by(column.asc())
+        else:
+            query = query.order_by(column.desc())
+    else:
+        query = query.order_by(SubCategory.id.desc())
+        
+    items, total, total_pages = paginate(query, page, page_size)
+    
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages
+    }
 
 @router.get("/sub-categories/all", response_model=List[SubCategoryResponse])
 def list_all_sub_categories(db: Session = Depends(get_db_with_tenant), user: User = Depends(get_current_tenant_user)):

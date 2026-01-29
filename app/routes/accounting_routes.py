@@ -804,6 +804,8 @@ def get_purchase_register(
     
     for grn, supplier_name in results:
         amount = Decimal(str(grn.net_total or 0.0))
+        adv_tax = Decimal(str(grn.advance_tax or 0.0))
+        
         items.append(PurchaseRegisterItem(
             id=grn.id,
             grn_number=grn.custom_grn_no or f"GRN-{grn.id}",
@@ -811,6 +813,7 @@ def get_purchase_register(
             supplier_name=supplier_name,
             invoice_number=grn.invoice_no,
             amount=amount,
+            advance_tax=adv_tax,
             payment_mode=grn.payment_mode or "Credit"
         ))
         total_amount += amount

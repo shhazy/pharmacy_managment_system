@@ -284,42 +284,69 @@ class AccountingService:
         inventory_account = AccountingService.get_account_by_code(db, "1300")
         ap_account = AccountingService.get_account_by_code(db, "2000")
         cash_account = AccountingService.get_account_by_code(db, "1000")
+        tax_account = AccountingService.get_account_by_code(db, "1450") # Advance Tax Receivable
         
-        if not all([inventory_account, ap_account, cash_account]):
-            raise ValueError("Required accounts not found in Chart of Accounts")
+        if not all([inventory_account, ap_account, cash_account, tax_account]):
+            raise ValueError("Required accounts not found in Chart of Accounts (Ensure 1450 exists)")
         
-        # Calculate total amount
-        total_amount = grn.total_amount or Decimal('0.00')
-        if isinstance(total_amount, float):
-            total_amount = Decimal(str(total_amount))
+        # Calculate amounts
+        # Inventory value = SubTotal + Loading + Freight + PurchaseTax (if non-adjustable) + Other - Discount
+        # Note: advance_tax is kept separate as per user request
+        
+        # Helper to convert float to Decimal safely
+        def to_dec(val):
+            return Decimal(str(val or 0.0))
             
+        inv_val = (to_dec(grn.sub_total) + to_dec(grn.loading_exp) + 
+                  to_dec(grn.freight_exp) + to_dec(grn.other_exp) + 
+                  to_dec(grn.purchase_tax) - to_dec(grn.discount))
+                  
+        tax_val = to_dec(grn.advance_tax)
+        total_liability = to_dec(grn.net_total)
+        
         # Determine if cash or credit purchase (mode from GRN)
         is_cash_purchase = grn.payment_mode.strip().lower() == "cash" if grn.payment_mode else False
         
         # 1. ALWAYS Record the Purchase against AP first to maintain Supplier Ledger history
-        purchase_lines = [
-            JournalEntryLineCreate(
-                account_id=inventory_account.id,
-                debit_amount=total_amount,
+        purchase_lines = []
+        line_num = 1
+        
+        # Line 1: Inventory (Debit)
+        purchase_lines.append(JournalEntryLineCreate(
+            account_id=inventory_account.id,
+            debit_amount=inv_val,
+            credit_amount=Decimal('0.00'),
+            description=f"Inventory - GRN #{grn.custom_grn_no} (Landed Cost exc. Advance Tax)",
+            line_number=line_num
+        ))
+        line_num += 1
+        
+        # Line 2: Advance Tax (Debit) - Only if > 0
+        if tax_val > 0:
+            purchase_lines.append(JournalEntryLineCreate(
+                account_id=tax_account.id,
+                debit_amount=tax_val,
                 credit_amount=Decimal('0.00'),
-                description=f"Purchase - GRN #{grn.grn_number}",
-                line_number=1
-            ),
-            JournalEntryLineCreate(
-                account_id=ap_account.id,
-                debit_amount=Decimal('0.00'),
-                credit_amount=total_amount,
-                description=f"Purchase - GRN #{grn.grn_number}",
-                line_number=2
-            )
-        ]
+                description=f"Advance Tax - GRN #{grn.custom_grn_no}",
+                line_number=line_num
+            ))
+            line_num += 1
+            
+        # Line 3: Accounts Payable (Credit)
+        purchase_lines.append(JournalEntryLineCreate(
+            account_id=ap_account.id,
+            debit_amount=Decimal('0.00'),
+            credit_amount=total_liability,
+            description=f"Accounts Payable - GRN #{grn.custom_grn_no}",
+            line_number=line_num
+        ))
         
         purchase_entry_data = JournalEntryCreate(
-            entry_date=grn.received_date or date.today(),
+            entry_date=grn.invoice_date.date() if grn.invoice_date else date.today(),
             transaction_type=TransactionType.PURCHASE,
             reference_type=ReferenceType.GRN,
             reference_id=grn.id,
-            description=f"Purchase - GRN #{grn.grn_number} ({grn.payment_mode})",
+            description=f"Purchase - GRN #{grn.custom_grn_no} ({grn.payment_mode})",
             lines=purchase_lines
         )
         
@@ -332,18 +359,18 @@ class AccountingService:
             if supplier:
                 # Update Supplier Master Balance
                 current_bal = Decimal(str(supplier.ledger_balance or 0.0))
-                supplier.ledger_balance = float(current_bal + total_amount)
+                supplier.ledger_balance = float(current_bal + total_liability)
 
             supplier_ledger_purchase = SupplierLedger(
                 supplier_id=grn.supplier_id,
                 journal_entry_id=purchase_entry.id,
                 transaction_date=purchase_entry.entry_date,
                 transaction_type=TransactionType.PURCHASE,
-                reference_number=grn.grn_number,
+                reference_number=grn.custom_grn_no,
                 debit_amount=Decimal('0.00'),
-                credit_amount=total_amount,
+                credit_amount=total_liability,
                 balance=Decimal(str(supplier.ledger_balance)),
-                description=f"Purchase - GRN #{grn.grn_number}"
+                description=f"Purchase - GRN #{grn.custom_grn_no}"
             )
             db.add(supplier_ledger_purchase)
             db.flush()
@@ -353,26 +380,26 @@ class AccountingService:
             payment_lines = [
                 JournalEntryLineCreate(
                     account_id=ap_account.id,
-                    debit_amount=total_amount,
+                    debit_amount=total_liability,
                     credit_amount=Decimal('0.00'),
-                    description=f"Cash Payment for GRN #{grn.grn_number}",
+                    description=f"Cash Payment for GRN #{grn.custom_grn_no}",
                     line_number=1
                 ),
                 JournalEntryLineCreate(
                     account_id=cash_account.id,
                     debit_amount=Decimal('0.00'),
-                    credit_amount=total_amount,
-                    description=f"Cash Payment for GRN #{grn.grn_number}",
+                    credit_amount=total_liability,
+                    description=f"Cash Payment for GRN #{grn.custom_grn_no}",
                     line_number=2
                 )
             ]
             
             payment_entry_data = JournalEntryCreate(
-                entry_date=grn.received_date or date.today(),
+                entry_date=grn.invoice_date.date() if grn.invoice_date else date.today(),
                 transaction_type=TransactionType.PAYMENT,
                 reference_type=ReferenceType.GRN,
                 reference_id=grn.id,
-                description=f"Immediate Cash Payment - GRN #{grn.grn_number}",
+                description=f"Immediate Cash Payment - GRN #{grn.custom_grn_no}",
                 lines=payment_lines
             )
             
@@ -383,34 +410,36 @@ class AccountingService:
                 if supplier:
                     # Deduct from Supplier Master Balance
                     current_bal = Decimal(str(supplier.ledger_balance or 0.0))
-                    supplier.ledger_balance = float(current_bal - total_amount)
+                    supplier.ledger_balance = float(current_bal - total_liability)
 
                 supplier_ledger_payment = SupplierLedger(
                     supplier_id=grn.supplier_id,
                     journal_entry_id=payment_entry.id,
                     transaction_date=payment_entry.entry_date,
                     transaction_type=TransactionType.PAYMENT,
-                    reference_number=grn.grn_number,
-                    debit_amount=total_amount,
+                    reference_number=grn.custom_grn_no,
+                    debit_amount=total_liability,
                     credit_amount=Decimal('0.00'),
                     balance=Decimal(str(supplier.ledger_balance)),
-                    description=f"Cash Payment - GRN #{grn.grn_number}"
+                    description=f"Cash Payment - GRN #{grn.custom_grn_no}"
                 )
                 db.add(supplier_ledger_payment)
                 
             # Create a PaymentVoucher record as well
             payment_voucher = PaymentVoucher(
-                voucher_number=f"PV-GRN-{grn.grn_number}",
+                voucher_number=f"PV-GRN-{grn.custom_grn_no}",
                 payment_date=payment_entry.entry_date,
                 payment_method=PaymentMethod.CASH,
                 payee_type=PayeeType.SUPPLIER,
                 payee_id=grn.supplier_id,
-                amount=total_amount,
+                amount=total_liability,
                 account_id=cash_account.id,
                 journal_entry_id=payment_entry.id,
-                description=f"Auto-generated payment for Cash GRN #{grn.grn_number}",
+                description=f"Auto-generated payment for Cash GRN #{grn.custom_grn_no}",
                 created_by=user_id
             )
+            db.add(payment_voucher)
+            db.commit()
             db.add(payment_voucher)
             db.commit()
             
@@ -512,3 +541,101 @@ class AccountingService:
             balance += (total_credit - total_debit)
             
         return balance
+
+    @staticmethod
+    def record_inventory_adjustment_accounting(
+        db: Session,
+        adjustment: Any, # StockAdjustment model instance
+        user_id: Optional[int] = None
+    ) -> Optional[JournalEntry]:
+        """
+        Record accounting entries for specific inventory adjustment types.
+        Currently handles: Return to Supplier
+        
+        Return to Supplier Logic:
+        Dr. Accounts Payable (2000)
+            Cr. Inventory (1300)
+        """
+        if adjustment.adjustment_type != "return_to_supplier":
+            return None
+            
+        # Get accounts
+        inventory_account = AccountingService.get_account_by_code(db, "1300")
+        ap_account = AccountingService.get_account_by_code(db, "2000")
+        
+        if not all([inventory_account, ap_account]):
+            # Log warning or handle as needed - strictly speaking we might want to fail 
+            # but adjustments can be non-financial too. For Return to Supplier, it MUST have accounts.
+            raise ValueError("Required accounts (Inventory 1300, AP 2000) not found in COA")
+
+        # Get the associated inventory record to find supplier and unit cost
+        # adjustment.inventory is available via relationship
+        stock = adjustment.inventory
+        if not stock:
+            raise ValueError("Associated inventory record not found for adjustment")
+            
+        supplier_id = stock.supplier_id
+        unit_cost = Decimal(str(stock.unit_cost or 0.0))
+        qty = Decimal(str(abs(adjustment.quantity_adjusted)))
+        total_value = unit_cost * qty
+        
+        if total_value <= 0:
+            return None # No financial impact if cost is 0
+
+        # 1. Create Journal Entry
+        lines = [
+            JournalEntryLineCreate(
+                account_id=ap_account.id,
+                debit_amount=total_value,
+                credit_amount=Decimal('0.00'),
+                description=f"Supplier Return - Adjustment #{adjustment.adjustment_id} (Batch: {adjustment.batch_number})",
+                line_number=1
+            ),
+            JournalEntryLineCreate(
+                account_id=inventory_account.id,
+                debit_amount=Decimal('0.00'),
+                credit_amount=total_value,
+                description=f"Supplier Return - Adjustment #{adjustment.adjustment_id} (Batch: {adjustment.batch_number})",
+                line_number=2
+            )
+        ]
+        
+        adj_entry_data = JournalEntryCreate(
+            entry_date=adjustment.adjustment_date.date() if adjustment.adjustment_date else date.today(),
+            transaction_type=TransactionType.ADJUSTMENT,
+            reference_type=ReferenceType.MANUAL, # Could add RETURN to ReferenceType if needed
+            reference_id=adjustment.adjustment_id,
+            description=f"Stock Return to Supplier - Adj #{adjustment.adjustment_id} - Qty: {qty}",
+            lines=lines
+        )
+        
+        journal_entry = AccountingService.create_journal_entry(db, adj_entry_data, user_id)
+        
+        # 2. Update Supplier Ledger if we have a supplier
+        if supplier_id:
+            supplier = db.query(Supplier).get(supplier_id)
+            if supplier:
+                # Update Supplier Master Balance (Debit reduces liability)
+                current_ledger_bal = Decimal(str(supplier.ledger_balance or 0.0))
+                supplier.ledger_balance = float(current_ledger_bal - total_value)
+                
+                # Create Ledger Row
+                supplier_ledger = SupplierLedger(
+                    supplier_id=supplier_id,
+                    journal_entry_id=journal_entry.id,
+                    transaction_date=journal_entry.entry_date,
+                    transaction_type=TransactionType.ADJUSTMENT,
+                    reference_number=f"ADJ-{adjustment.adjustment_id}",
+                    debit_amount=total_value,
+                    credit_amount=Decimal('0.00'),
+                    balance=Decimal(str(supplier.ledger_balance)),
+                    description=f"Returns - Adj #{adjustment.adjustment_id}"
+                )
+                db.add(supplier_ledger)
+                db.flush()
+        
+        # 3. Link Journal to Adjustment
+        adjustment.journal_entry_id = journal_entry.id
+        db.commit()
+        
+        return journal_entry

@@ -1,20 +1,31 @@
-from sqlalchemy import text, inspect
-from app.database import engine
+from sqlalchemy import create_engine, text
+import os
+from dotenv import load_dotenv
 
-def check_columns():
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/pharmacy_db")
+engine = create_engine(DATABASE_URL)
+
+def check_db():
     with engine.connect() as conn:
-        conn.execute(text("SET search_path TO tenant_t1, public"))
-        inspector = inspect(engine)
+        # Get all schemas
+        result = conn.execute(text("SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('information_schema', 'pg_catalog', 'public');"))
+        schemas = [row[0] for row in result]
+        print(f"Schemas found: {schemas}")
         
-        tables = ['suppliers', 'supplier_ledger', 'customer_ledger', 'invoices', 'journal_entries', 'journal_entry_lines', 'patients']
-        
-        for table in tables:
+        for schema in schemas:
+            print(f"\nChecking schema: {schema}")
+            # Check if foc_quantity exists in grn_items
             try:
-                columns = inspector.get_columns(table, schema='tenant_t1')
-                col_names = [c['name'] for c in columns]
-                print(f"{table.upper()}: {col_names}")
+                result = conn.execute(text(f"SELECT column_name FROM information_schema.columns WHERE table_schema = '{schema}' AND table_name = 'grn_items';"))
+                columns = [row[0] for row in result]
+                print(f"Columns in {schema}.grn_items: {columns}")
+                if 'foc_quantity' not in columns:
+                    print(f"!!! MISSING foc_quantity in {schema}.grn_items")
+                else:
+                    print(f"✓ foc_quantity exists in {schema}.grn_items")
             except Exception as e:
-                print(f"Error checking {table}: {e}")
+                print(f"Error checking {schema}: {e}")
 
 if __name__ == "__main__":
-    check_columns()
+    check_db()

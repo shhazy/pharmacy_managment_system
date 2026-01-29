@@ -19,7 +19,7 @@ def get_inventory(db: Session = Depends(get_db_with_tenant), user: User = Depend
         Generic.name.label("gen_name")
     ).outerjoin(Category, Product.category_id == Category.id)\
      .outerjoin(Generic, Product.generics_id == Generic.id)\
-     .options(joinedload(Product.stock_inventory))\
+     .options(joinedload(Product.stock_inventory), joinedload(Product.product_suppliers))\
      .all()
     
     response = []
@@ -38,9 +38,12 @@ def get_inventory(db: Session = Depends(get_db_with_tenant), user: User = Depend
             "generic_name": gen_name or "N/A",
             "category": cat_name or "Uncategorized",
             "supplier_id": p.supplier_id,
+            "product_suppliers": [{"supplier_id": ps.supplier_id} for ps in p.product_suppliers],
             "manufacturer_id": p.manufacturer_id,
             "purchase_conv_unit_id": p.purchase_conv_unit_id,
             "purchase_conv_factor": p.purchase_conv_factor,
+            "preferred_purchase_unit_id": p.preferred_purchase_unit_id,
+            "preferred_pos_unit_id": p.preferred_pos_unit_id,
             "average_cost": p.average_cost,
             "retail_price": p.retail_price,
             "control_drug": p.control_drug,
@@ -87,7 +90,8 @@ def get_stock_list(db: Session = Depends(get_db_with_tenant), user: User = Depen
             "selling_price": s.selling_price,
             "supplier_name": s.supplier.name if s.supplier else "N/A",
             "supplier_id": s.supplier_id,
-            "product_id": s.product_id
+            "product_id": s.product_id,
+            "created_at": s.created_at.isoformat() if s.created_at else None
         })
     return response
 

@@ -32,7 +32,7 @@ class Product(Base):
     
     # Core fields
     line_item_id = Column(Integer, ForeignKey("line_items.id"), nullable=True)
-    product_name = Column(String, index=True)
+    product_name = Column(String, index=True, unique=True)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     sub_category_id = Column(Integer, ForeignKey("sub_categories.id"), nullable=True)
     product_group_id = Column(Integer, ForeignKey("product_groups.id"), nullable=True)
@@ -43,6 +43,8 @@ class Product(Base):
     rack_id = Column(Integer, ForeignKey("racks.id"), nullable=True)
     supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=True)
     purchase_conv_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
+    preferred_purchase_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
+    preferred_pos_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
     
     # Control and flags
     control_drug = Column(Boolean, default=False)  # 1 or 0
@@ -75,12 +77,22 @@ class Product(Base):
     manufacturer = relationship("Manufacturer")
     rack = relationship("Rack")
     supplier = relationship("Supplier")
-    purchase_conv_unit = relationship("PurchaseConversionUnit")
+    purchase_conv_unit = relationship("PurchaseConversionUnit", foreign_keys=[purchase_conv_unit_id])
+    preferred_purchase_unit = relationship("PurchaseConversionUnit", foreign_keys=[preferred_purchase_unit_id])
+    preferred_pos_unit = relationship("PurchaseConversionUnit", foreign_keys=[preferred_pos_unit_id])
 
     stock_inventory = relationship("StockInventory", back_populates="product")
     ingredients = relationship("ProductIngredient", back_populates="product")
     product_suppliers = relationship("ProductSupplier", back_populates="product")
     history = relationship("ProductHistory", back_populates="product")
+
+    @property
+    def uom(self):
+        return self.preferred_pos_unit.name if self.preferred_pos_unit else "Unit"
+
+    @property
+    def purchase_conv_unit_name(self):
+        return self.purchase_conv_unit.name if self.purchase_conv_unit else None
 
 class ProductIngredient(Base):
     __tablename__ = "product_ingredients"
@@ -139,3 +151,9 @@ class Supplier(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
+
+class AppSettings(Base):
+    __tablename__ = "app_settings"
+    id = Column(Integer, primary_key=True, index=True)
+    default_listing_rows = Column(Integer, default=10)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
