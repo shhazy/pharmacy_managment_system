@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from typing import List
+from typing import List, Optional
 from datetime import datetime, timedelta
 import traceback
 
@@ -10,7 +10,7 @@ from ..models import (
     Tenant, User, Role, Product, SuperAdmin, Permission, 
     StockInventory, Category, Manufacturer, Supplier, Store
 )
-from ..schemas import TenantCreate, TenantResponse
+from ..schemas import TenantCreate, TenantResponse, TenantUpdate
 from ..auth import get_password_hash, get_current_superadmin
 
 router = APIRouter()
@@ -43,7 +43,9 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
             subdomain=tenant_in.subdomain, 
             schema_name=schema_name, 
             admin_username=tenant_in.admin_username, 
-            admin_password=get_password_hash(tenant_in.admin_password)
+            admin_password=get_password_hash(tenant_in.admin_password),
+            is_trial=tenant_in.is_trial,
+            trial_end_date=tenant_in.trial_end_date
         )
         db.add(db_tenant)
         db.flush()
@@ -198,3 +200,36 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
 def list_tenants(db: Session = Depends(get_db), admin: SuperAdmin = Depends(get_current_superadmin)):
     db.execute(text("SET search_path TO public"))
     return db.query(Tenant).all()
+
+@router.patch("/{tenant_id}", response_model=TenantResponse)
+def update_tenant(tenant_id: int, tenant_in: TenantUpdate, db: Session = Depends(get_db), admin: SuperAdmin = Depends(get_current_superadmin)):
+    db.execute(text("SET search_path TO public"))
+    db_tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
+    if not db_tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    if tenant_in.name is not None:
+        db_tenant.name = tenant_in.name
+    if tenant_in.is_active is not None:
+        db_tenant.is_active = tenant_in.is_active
+    if tenant_in.is_trial is not None:
+        db_tenant.is_trial = tenant_in.is_trial
+    if tenant_in.trial_end_date is not None:
+        db_tenant.trial_end_date = tenant_in.trial_end_date
+    
+    db.commit()
+    db.refresh(db_tenant)
+    return db_tenant
+
+@router.delete("/{tenant_id}")
+def delete_tenant(tenant_id: int, db: Session = Depends(get_db), admin: SuperAdmin = Depends(get_current_superadmin)):
+    db.execute(text("SET search_path TO public"))
+    db_tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
+    if not db_tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    # Optional: Drop schema? (Usually safer to just deactivate OR have a separate "purge" step)
+    # For now, let's keep the user's requested "remove" logic which was in the frontend but missing in backend
+    db.delete(db_tenant)
+    db.commit()
+    return {"detail": "Tenant deleted"}

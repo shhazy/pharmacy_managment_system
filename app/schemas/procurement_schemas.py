@@ -67,7 +67,7 @@ class PurchaseOrderResponse(PurchaseOrderBase):
         from_attributes = True
 
 class POGenerateRequest(BaseModel):
-    supplier_ids: List[int]
+    supplier_id: int
     method: str  # min, optimal, max, sale, none
     sale_start_date: Optional[datetime] = None
     sale_end_date: Optional[datetime] = None
@@ -126,7 +126,7 @@ class GRNResponse(GRNCreate):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Stock Adjustment Schemas ---
 class StockAdjustmentCreate(BaseModel):

@@ -51,6 +51,7 @@ class ProductCreate(BaseModel):
     rack_id: Optional[int] = None
     supplier_id: Optional[int] = None
     purchase_conv_unit_id: Optional[int] = None
+    base_unit_id: Optional[int] = None
     preferred_purchase_unit_id: Optional[int] = None
     preferred_pos_unit_id: Optional[int] = None
     control_drug: bool = False
@@ -65,6 +66,7 @@ class ProductCreate(BaseModel):
     min_inventory_level: Optional[int] = None
     optimal_inventory_level: Optional[int] = None
     max_inventory_level: Optional[int] = None
+    tax_percent: float = 0.0
     allow_below_cost_sale: bool = False
     allow_price_change: bool = True
     suppliers: List[ProductSupplierData] = []
@@ -82,6 +84,7 @@ class ProductUpdate(BaseModel):
     rack_id: Optional[int] = None
     supplier_id: Optional[int] = None
     purchase_conv_unit_id: Optional[int] = None
+    base_unit_id: Optional[int] = None
     preferred_purchase_unit_id: Optional[int] = None
     preferred_pos_unit_id: Optional[int] = None
     control_drug: Optional[bool] = None
@@ -96,6 +99,7 @@ class ProductUpdate(BaseModel):
     min_inventory_level: Optional[int] = None
     optimal_inventory_level: Optional[int] = None
     max_inventory_level: Optional[int] = None
+    tax_percent: Optional[float] = None
     allow_below_cost_sale: Optional[bool] = None
     allow_price_change: Optional[bool] = None
     suppliers: Optional[List[ProductSupplierData]] = None
@@ -114,6 +118,7 @@ class ProductResponse(BaseModel):
     rack_id: Optional[int]
     supplier_id: Optional[int]
     purchase_conv_unit_id: Optional[int]
+    base_unit_id: Optional[int]
     preferred_purchase_unit_id: Optional[int]
     preferred_pos_unit_id: Optional[int]
     control_drug: bool
@@ -128,6 +133,7 @@ class ProductResponse(BaseModel):
     min_inventory_level: Optional[int]
     optimal_inventory_level: Optional[int]
     max_inventory_level: Optional[int]
+    tax_percent: float
     allow_below_cost_sale: bool
     allow_price_change: bool
     product_suppliers: List[ProductSupplierResponse] = []
@@ -201,18 +207,16 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db_with_ten
         db.add(db_product)
         db.flush()
         db_product_id = db_product.id
+
+        # Add Suppliers
+        for sup in suppliers_data:
+            db_sup = ProductSupplier(product_id=db_product_id, **sup)
+            db.add(db_sup)
+        
         db.commit()
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="A product with this name already exists.")
-
-    # Add Suppliers
-    for sup in suppliers_data:
-        db_sup = ProductSupplier(product_id=db_product_id, **sup)
-        db.add(db_sup)
-    db.commit()
-    
-    # db.refresh(db_product)
     
     # Restore tenant search path
     tenant_schema = db.info.get('tenant_schema')

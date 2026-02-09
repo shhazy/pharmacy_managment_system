@@ -43,6 +43,7 @@ class Product(Base):
     rack_id = Column(Integer, ForeignKey("racks.id"), nullable=True)
     supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=True)
     purchase_conv_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
+    base_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
     preferred_purchase_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
     preferred_pos_unit_id = Column(Integer, ForeignKey("purchase_conversion_units.id"), nullable=True)
     
@@ -57,6 +58,7 @@ class Product(Base):
     purchase_conv_factor = Column(Integer, nullable=True)
     average_cost = Column(Float, nullable=True)
     retail_price = Column(Float, nullable=True)
+    tax_percent = Column(Float, default=0.0)
     min_inventory_level = Column(Integer, nullable=True)
     optimal_inventory_level = Column(Integer, nullable=True)
     max_inventory_level = Column(Integer, nullable=True)
@@ -78,6 +80,7 @@ class Product(Base):
     rack = relationship("Rack")
     supplier = relationship("Supplier")
     purchase_conv_unit = relationship("PurchaseConversionUnit", foreign_keys=[purchase_conv_unit_id])
+    base_unit = relationship("PurchaseConversionUnit", foreign_keys=[base_unit_id])
     preferred_purchase_unit = relationship("PurchaseConversionUnit", foreign_keys=[preferred_purchase_unit_id])
     preferred_pos_unit = relationship("PurchaseConversionUnit", foreign_keys=[preferred_pos_unit_id])
 
@@ -156,4 +159,11 @@ class AppSettings(Base):
     __tablename__ = "app_settings"
     id = Column(Integer, primary_key=True, index=True)
     default_listing_rows = Column(Integer, default=10)
+    
+    # Invoice Template Settings
+    invoice_template_id = Column(String, default="default") # default, compact, detailed, thermal, custom
+    invoice_custom_config = Column(JSON, nullable=True) # Custom layout params
+    sale_module = Column(String, default="Default") # Default, FIFO, FEFO, Avg Cost
+    stock_adj_batch_required = Column(Boolean, default=False)
+    
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

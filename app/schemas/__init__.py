@@ -1,6 +1,6 @@
 # Schemas package - exports all Pydantic models
 from .auth_schemas import Token, LoginRequest
-from .tenant_schemas import TenantCreate, TenantResponse
+from .tenant_schemas import TenantCreate, TenantResponse, TenantUpdate
 from .user_schemas import (
     PermissionResponse, RoleResponse, UserCreate, 
     UserUpdate, UserResponse, RoleCreate, RoleUpdate
@@ -14,12 +14,16 @@ from .procurement_schemas import (
     POGenerateRequest, POSuggestionItem,
     GRNCreate, GRNItemCreate, GRNResponse
 )
+from .software_payment_schemas import (
+    SoftwarePaymentCreate, SoftwarePaymentResponse, SoftwarePaymentUpdate
+)
 
 __all__ = [
     "Token",
     "LoginRequest",
     "TenantCreate",
     "TenantResponse",
+    "TenantUpdate",
     "PermissionResponse",
     "RoleResponse",
     "UserCreate",
@@ -41,4 +45,7 @@ __all__ = [
     "GRNCreate",
     "GRNItemCreate",
     "GRNResponse",
+    "SoftwarePaymentCreate",
+    "SoftwarePaymentResponse",
+    "SoftwarePaymentUpdate",
 ]

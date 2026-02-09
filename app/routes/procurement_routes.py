@@ -169,10 +169,10 @@ def delete_po(order_id: int, db: Session = Depends(get_db_with_tenant)):
 def generate_suggestions(req: POGenerateRequest, db: Session = Depends(get_db_with_tenant)):
     try:
         from ..models import StockInventory, ProductSupplier
-        # Fetch products for the suppliers with joinedload for efficiency
+        # Fetch products for the supplier with joinedload for efficiency
         # We search in both primary supplier_id and secondary product_suppliers table
         products = db.query(Product).options(joinedload(Product.manufacturer)).outerjoin(ProductSupplier).filter(
-            (Product.supplier_id.in_(req.supplier_ids)) | (ProductSupplier.supplier_id.in_(req.supplier_ids))
+            (Product.supplier_id == req.supplier_id) | (ProductSupplier.supplier_id == req.supplier_id)
         ).distinct().all()
         suggestions = []
         
@@ -208,11 +208,8 @@ def generate_suggestions(req: POGenerateRequest, db: Session = Depends(get_db_wi
                 suggested_qty = sold_qty
                 
             # Always include the product in suggestions, even if qty is 0
-            # Map to the most relevant selected supplier
-            target_sup_id = p.supplier_id if p.supplier_id in req.supplier_ids else None
-            if not target_sup_id:
-                match = next((ps.supplier_id for ps in (p.product_suppliers or []) if ps.supplier_id in req.supplier_ids), None)
-                target_sup_id = match or p.supplier_id
+            # Map to the selected supplier
+            target_sup_id = req.supplier_id
 
             suggestions.append(POSuggestionItem(
                 product_id=p.id,
@@ -354,18 +351,18 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
         db.commit()
         # db.refresh(db_grn)
         
-        # Restore tenant search path
+        # Restore search path before accounting call as previous commit might have affected connection state
         tenant_schema = db.info.get('tenant_schema')
         if tenant_schema:
             db.execute(text(f"SET search_path TO {tenant_schema}, public"))
 
-        db_grn = db.query(GRN).filter(GRN.id == grn_id).first()
-        
         # 5. Create Accounting Entry
         try:
             from ..services.accounting_service import AccountingService
             
             # Create purchase journal entry
+            # Ensure db_grn is fresh for this call
+            db_grn = db.query(GRN).filter(GRN.id == grn_id).first()
             AccountingService.record_purchase_transaction(db, db_grn, user_id=None)
             
             print(f"✓ Accounting entry created for GRN {custom_grn_no}")
@@ -374,7 +371,13 @@ def create_grn(grn_in: GRNCreate, db: Session = Depends(get_db_with_tenant)):
             print(f"⚠ Warning: Failed to create accounting entry: {acc_err}")
             import traceback
             traceback.print_exc()
-        
+
+        # 6. Final fetch with joinedload to ensure everything is loaded before returning
+        # This prevents lazy-loading issues during serialization especially in multi-tenant contexts
+        if tenant_schema:
+            db.execute(text(f"SET search_path TO {tenant_schema}, public"))
+
+        db_grn = db.query(GRN).options(joinedload(GRN.items)).filter(GRN.id == grn_id).first()
         return db_grn
 
     except Exception as e:

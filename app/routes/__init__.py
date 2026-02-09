@@ -15,6 +15,9 @@ from .inventory_crud_routes import router as inventory_crud_router
 from .inventory_adjustment_routes import router as inventory_adjustment_router
 from .product_routes import router as product_router
 from .accounting_routes import router as accounting_router
+from .customer_routes import router as customer_router
+from .software_payment_routes import router as software_payment_router
+from .superadmin_routes import router as superadmin_router
 
 # Create main router
 api_router = APIRouter()
@@ -35,6 +38,9 @@ api_router.include_router(inventory_crud_router, prefix="/inventory", tags=["Inv
 api_router.include_router(inventory_adjustment_router, prefix="/inventory", tags=["Inventory Adjustment"])
 api_router.include_router(product_router, prefix="/products", tags=["Products"])
 api_router.include_router(accounting_router)
+api_router.include_router(customer_router, prefix="/customers", tags=["Customers"])
+api_router.include_router(superadmin_router, prefix="/superadmin", tags=["SuperAdmin"])
+api_router.include_router(software_payment_router, prefix="/software-payments", tags=["Software Payments"])
 
 
 __all__ = ["api_router"]

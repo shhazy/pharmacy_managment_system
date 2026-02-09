@@ -11,6 +11,7 @@ def seed_standard_coa():
         
         standard_accounts = [
             {"code": "1000", "name": "Cash In Hand", "account_type": AccountType.ASSET},
+            {"code": "1100", "name": "Bank / Card", "account_type": AccountType.ASSET},
             {"code": "1300", "name": "Inventory", "account_type": AccountType.ASSET},
             {"code": "2000", "name": "Accounts Payable", "account_type": AccountType.LIABILITY},
             {"code": "4000", "name": "Sales Revenue", "account_type": AccountType.REVENUE},

@@ -128,7 +128,8 @@ class CustomerLedger(Base):
     __tablename__ = "customer_ledger"
     
     id = Column(Integer, primary_key=True, index=True)
-    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=False)
+    patient_id = Column(Integer, ForeignKey('patients.id'), nullable=True)
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=True)
     journal_entry_id = Column(Integer, ForeignKey('journal_entries.id'), nullable=False)
     transaction_date = Column(Date, nullable=False, index=True)
     transaction_type = Column(SQLEnum(TransactionType), nullable=False)
@@ -141,6 +142,7 @@ class CustomerLedger(Base):
     
     # Relationships
     patient = relationship("Patient")
+    customer = relationship("Customer")
     journal_entry = relationship("JournalEntry")
 
 class PaymentVoucher(Base):

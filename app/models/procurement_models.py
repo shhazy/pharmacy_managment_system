@@ -125,6 +125,8 @@ class StockInventory(Base):
     quantity = Column(Float, nullable=False, default=0)
     unit_cost = Column(Float, nullable=True)  # Landed cost per unit
     selling_price = Column(Float, nullable=True)
+    retail_price = Column(Float, nullable=True) # MRP per batch
+    tax_percent = Column(Float, default=0.0) # GST % per batch
     
     warehouse_location = Column(String(100), nullable=True)  # Shelf/rack location
     store_id = Column(Integer, ForeignKey("stores.id"), nullable=True)

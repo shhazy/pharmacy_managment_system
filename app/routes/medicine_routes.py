@@ -44,9 +44,21 @@ def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
         .group_by(Product.id, Category.name, Manufacturer.name, Generic.name, PurchaseUnit.name, PosUnit.name)\
         .all()
     
+    from ..models.pharmacy_models import AppSettings
+    app_settings = db.query(AppSettings).first()
+    sale_module = app_settings.sale_module if app_settings else "FIFO"
+
     # Map to list of dicts or enhanced objects
     response = []
     for product, stock, cat_name, man_name, gen_name, p_unit_name, pos_unit_name in results:
+        
+        # Sort stock inventory based on setting
+        available_batches = [s for s in product.stock_inventory if s.is_available]
+        if sale_module == "FEFO":
+            available_batches.sort(key=lambda x: (x.expiry_date is None, x.expiry_date))
+        else: # FIFO and Avg Cost
+            available_batches.sort(key=lambda x: x.inventory_id)
+
         p_dict = {
             "id": product.id,
             "product_name": product.product_name,
@@ -58,6 +70,7 @@ def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
             "manufacturer_id": product.manufacturer_id,
             "category": {"id": product.category_id, "name": cat_name or "Uncategorized"},
             "manufacturer": {"id": product.manufacturer_id, "name": man_name or "N/A"},
+            "tax_percent": product.tax_percent or 0,
             "uom": pos_unit_name or "Unit", # Base unit name from POS Unit
             "purchase_conv_unit_id": product.purchase_conv_unit_id,
             "purchase_conv_unit_name": p_unit_name, # Also providing this if needed
@@ -70,9 +83,11 @@ def search_products(q: str, db: Session = Depends(get_db_with_tenant)):
                     "batch_number": s.batch_number,
                     "quantity": s.quantity,
                     "selling_price": s.selling_price,
+                    "retail_price": s.retail_price,
+                    "tax_percent": s.tax_percent,
                     "expiry_date": s.expiry_date.isoformat() if s.expiry_date else None
-                } for s in product.stock_inventory if s.is_available
-            ] if hasattr(product, 'stock_inventory') else []
+                } for s in available_batches
+            ]
         }
         response.append(p_dict)
     return response
@@ -109,6 +124,7 @@ def add_product(med: MedicineCreate, db: Session = Depends(get_db_with_tenant), 
         rack_id=getattr(med, 'rack_id', None),
         supplier_id=getattr(med, 'supplier_id', None),
         purchase_conv_unit_id=getattr(med, 'purchase_conv_unit_id', None),
+        tax_percent=getattr(med, 'tax_percent', 0.0),
         product_type=getattr(med, 'product_type', 1),
         active=True
     )

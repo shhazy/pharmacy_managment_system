@@ -18,5 +18,6 @@ class RegulatoryLog(Base):
     action = Column(String) # Dispensed, Received
     quantity = Column(Integer)
     patient_id = Column(Integer, ForeignKey("patients.id"), nullable=True)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 

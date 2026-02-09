@@ -1,6 +1,6 @@
 # Models package - exports all models
 from ..database import Base
-from .public_models import Tenant, SuperAdmin
+from .public_models import Tenant, SuperAdmin, SoftwarePayment
 from .user_models import User, Role, Permission, Store, user_roles, role_permissions
 from .pharmacy_models import (
     Manufacturer, Category, Product, ProductIngredient, 
@@ -17,6 +17,8 @@ from .accounting_models import (
     Account, JournalEntry, JournalEntryLine, SupplierLedger,
     CustomerLedger, PaymentVoucher, ReceiptVoucher
 )
+
+from .customer_models import Customer, CustomerType, CustomerGroup
 
 __all__ = [
     "Base",  # Re-exported from database
@@ -66,4 +68,8 @@ __all__ = [
     "PaymentVoucher",
     "ReceiptVoucher",
     "AppSettings",
+    "Customer",
+    "CustomerType",
+    "CustomerGroup",
+    "SoftwarePayment",
 ]

@@ -1,0 +1,11 @@
+Starting...
+Error: (psycopg2.errors.UndefinedColumn) column products.base_unit_id does not exist
+LINE 1: ...e_conv_unit_id AS products_purchase_conv_unit_id, products.b...
+                                                             ^
+
+[SQL: SELECT products.id AS products_id, products.line_item_id AS products_line_item_id, products.product_name AS products_product_name, products.category_id AS products_category_id, products.sub_category_id AS products_sub_category_id, products.product_group_id AS products_product_group_id, products.category_group_id AS products_category_group_id, products.generics_id AS products_generics_id, products.cal_season_id AS products_cal_season_id, products.manufacturer_id AS products_manufacturer_id, products.rack_id AS products_rack_id, products.supplier_id AS products_supplier_id, products.purchase_conv_unit_id AS products_purchase_conv_unit_id, products.base_unit_id AS products_base_unit_id, products.preferred_purchase_unit_id AS products_preferred_purchase_unit_id, products.preferred_pos_unit_id AS products_preferred_pos_unit_id, products.control_drug AS products_control_drug, products.active AS products_active, products.product_type AS products_product_type, products.allow_below_cost_sale AS products_allow_below_cost_sale, products.allow_price_change AS products_allow_price_change, products.purchase_conv_factor AS products_purchase_conv_factor, products.average_cost AS products_average_cost, products.retail_price AS products_retail_price, products.tax_percent AS products_tax_percent, products.min_inventory_level AS products_min_inventory_level, products.optimal_inventory_level AS products_optimal_inventory_level, products.max_inventory_level AS products_max_inventory_level, products.date AS products_date, products.technical_details AS products_technical_details, products.internal_comments AS products_internal_comments 
+FROM products 
+ LIMIT %(param_1)s]
+[parameters: {'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+Finished.

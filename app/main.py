@@ -1,15 +1,17 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 import traceback
 
 from .database import engine, Base, SessionLocal
-from .models import Tenant, SuperAdmin
+from .models import Tenant, SuperAdmin, SoftwarePayment
 from .auth import get_password_hash
 from .routes import api_router
 
 app = FastAPI(title="Pro Pharmacy ERP API")
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -68,7 +70,7 @@ app.include_router(api_router)
 @app.on_event("startup")
 def startup():
     try:
-        Base.metadata.create_all(bind=engine, tables=[Tenant.__table__, SuperAdmin.__table__])
+        Base.metadata.create_all(bind=engine, tables=[Tenant.__table__, SuperAdmin.__table__, SoftwarePayment.__table__])
         db = SessionLocal()
         try:
             db.execute(text("SET search_path TO public"))
