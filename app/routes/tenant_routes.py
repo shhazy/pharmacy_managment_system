@@ -79,12 +79,51 @@ def create_tenant(tenant_in: TenantCreate, db: Session = Depends(get_db), admin:
             sdb.add_all(cats + mans + sups + [main_store]); sdb.flush()
 
             # 2. Roles & Perms
-            perms = [Permission(name=n) for n in ["manage_users", "manage_inventory", "manage_sales", "view_reports"]]
-            sdb.add_all(perms); sdb.flush()
+            # Comprehensive Permission List
+            PERMISSION_STRUCTURE = {
+                "Inventory > Products": ["list", "view", "add", "edit", "delete", "print_labels"],
+                "Inventory > Stock": ["list", "view", "adjust", "transfer", "view_history"],
+                "Inventory > Setup": ["list", "add", "edit", "delete"],
+                
+                "Sales > POS": ["access", "process_sale", "apply_discount", "void_item", "return_item"],
+                "Sales > Invoices": ["list", "view", "print", "cancel"],
+                "Sales > Customers": ["list", "view", "add", "edit", "delete", "view_history"],
+
+                "Procurement > Suppliers": ["list", "view", "add", "edit", "delete"],
+                "Procurement > Purchase Orders": ["list", "create", "edit", "approve", "delete", "print"],
+                "Procurement > GRN": ["list", "create", "view", "print"],
+
+                "Accounting > Chart of Accounts": ["list", "view", "add", "edit"],
+                "Accounting > Journal Entries": ["list", "create", "view", "print"],
+                "Accounting > Reports": ["view_daily", "view_financial", "view_inventory", "export"],
+                "Accounting > Payments": ["list", "create", "view", "approve"],
+
+                "Settings > General": ["view", "update"],
+                "Settings > User Management": ["list", "invite", "edit", "delete", "manage_roles"],
+                "Settings > Stores": ["list", "add", "edit", "delete"]
+            }
+
+            all_perms = []
+            for module, actions in PERMISSION_STRUCTURE.items():
+                for action in actions:
+                    perm_name = f"{module}:{action}"
+                    p = Permission(name=perm_name, module=module, action=action, description=f"Can {action.replace('_', ' ')} in {module}")
+                    all_perms.append(p)
             
-            admin_role = Role(name="Admin", description="Full Access", permissions=perms)
-            cashier_role = Role(name="Cashier", description="Sales Only", permissions=[p for p in perms if p.name in ["manage_sales"]])
-            sdb.add_all([admin_role, cashier_role]); sdb.flush()
+            sdb.add_all(all_perms); sdb.flush()
+            
+            # Create Default Roles
+            admin_role = Role(name="Admin", description="Full Access", permissions=all_perms)
+            
+            # Cashier Role - Sales Focused
+            cashier_perms = [p for p in all_perms if "Sales > POS" in p.module or "Sales > Invoices" in p.module]
+            cashier_role = Role(name="Cashier", description="Sales & POS Access", permissions=cashier_perms)
+            
+            # Stock Manager - Inventory Focused
+            stock_perms = [p for p in all_perms if "Inventory" in p.module or "Procurement" in p.module]
+            stock_role = Role(name="Stock Manager", description="Inventory & Procurement", permissions=stock_perms)
+
+            sdb.add_all([admin_role, cashier_role, stock_role]); sdb.flush()
 
             # 3. Admin User
             admin_user = User(username=tenant_in.admin_username, email=f"{tenant_in.admin_username}@{tenant_in.subdomain}.com", 
