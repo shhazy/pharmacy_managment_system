@@ -66,7 +66,9 @@ def sync_all_tenants():
                         "ALTER TABLE medicines ADD COLUMN IF NOT EXISTS license_number VARCHAR",
                         "ALTER TABLE medicines ADD COLUMN IF NOT EXISTS is_cold_chain BOOLEAN DEFAULT FALSE",
                         "ALTER TABLE medicines ADD COLUMN IF NOT EXISTS is_temp_log_required BOOLEAN DEFAULT FALSE",
-                        "ALTER TABLE medicines ADD COLUMN IF NOT EXISTS description TEXT"
+                        "ALTER TABLE medicines ADD COLUMN IF NOT EXISTS description TEXT",
+                        "ALTER TABLE invoices ADD COLUMN IF NOT EXISTS cash_register_session_id INTEGER REFERENCES cash_register_sessions(id)",
+                        "ALTER TABLE sales_returns ADD COLUMN IF NOT EXISTS cash_register_session_id INTEGER REFERENCES cash_register_sessions(id)"
                     ]
                     
                     for p in patches:

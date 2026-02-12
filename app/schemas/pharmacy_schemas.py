@@ -65,5 +65,6 @@ class InvoiceCreate(BaseModel):
     adjustment: float = 0.0
     tax_amount: float = 0.0
     payment_method: str = "Cash"
+    cash_register_session_id: Optional[int] = None
     remarks: Optional[str] = None
     status: str = "Paid"

@@ -18,6 +18,7 @@ from .accounting_routes import router as accounting_router
 from .customer_routes import router as customer_router
 from .software_payment_routes import router as software_payment_router
 from .superadmin_routes import router as superadmin_router
+from .cash_register_routes import router as cash_register_router
 
 # Create main router
 api_router = APIRouter()
@@ -41,6 +42,7 @@ api_router.include_router(accounting_router)
 api_router.include_router(customer_router, prefix="/customers", tags=["Customers"])
 api_router.include_router(superadmin_router, prefix="/superadmin", tags=["SuperAdmin"])
 api_router.include_router(software_payment_router, prefix="/software-payments", tags=["Software Payments"])
+api_router.include_router(cash_register_router, tags=["Cash Registers"])
 
 
 __all__ = ["api_router"]

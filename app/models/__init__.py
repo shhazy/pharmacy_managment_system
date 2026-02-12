@@ -19,6 +19,7 @@ from .accounting_models import (
 )
 
 from .customer_models import Customer, CustomerType, CustomerGroup
+from .cash_register_models import CashRegister, CashRegisterSession, CashDenominationCount, CashMovement
 
 __all__ = [
     "Base",  # Re-exported from database
@@ -72,4 +73,8 @@ __all__ = [
     "CustomerType",
     "CustomerGroup",
     "SoftwarePayment",
+    "CashRegister",
+    "CashRegisterSession",
+    "CashDenominationCount",
+    "CashMovement",
 ]

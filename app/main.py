@@ -16,33 +16,42 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-# CORS MUST BE THE FIRST MIDDLEWARE!
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r".*",
+    allow_origin_regex=r"https?://.*", # Allow all http/https origins properly
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]  # ADD THIS LINE - important!
+    expose_headers=["*"]
 )
 # GLOBAL EXCEPTION HANDLER
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    origin = request.headers.get("origin")
+    headers = {}
+    if origin:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+    
     if isinstance(exc, StarletteHTTPException):
         return JSONResponse(
             status_code=exc.status_code,
             content={"detail": exc.detail},
+            headers=headers
         )
     if isinstance(exc, RequestValidationError):
         return JSONResponse(
             status_code=422,
             content={"detail": exc.errors()},
+            headers=headers
         )
     
     traceback.print_exc()
     return JSONResponse(
-        status_code=500,  # Use 500 for real crashes
+        status_code=500,
         content={"detail": f"INTERNAL SERVER ERROR: {str(exc)}"},
+        headers=headers
     )
 
 @app.get("/")

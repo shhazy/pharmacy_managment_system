@@ -32,6 +32,9 @@ class Invoice(Base):
     store_id = Column(Integer, ForeignKey("stores.id"))
     customer_name = Column(String, nullable=True) # For walk-in customers
     
+    # Cash register session link
+    cash_register_session_id = Column(Integer, ForeignKey("cash_register_sessions.id"), nullable=True)
+    
     sub_total = Column(Float)
     tax_amount = Column(Float)
     discount_amount = Column(Float)
@@ -47,6 +50,7 @@ class Invoice(Base):
     items = relationship("InvoiceItem", back_populates="invoice")
     customer = relationship("Customer")
     user = relationship("User")
+    cash_register_session = relationship("CashRegisterSession", back_populates="invoices")
 
 class InvoiceItem(Base):
     __tablename__ = "invoice_items"
@@ -70,6 +74,9 @@ class SalesReturn(Base):
     return_number = Column(String, unique=True, index=True)
     invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=True) # Optional for ad-hoc returns
     
+    # Cash register session link
+    cash_register_session_id = Column(Integer, ForeignKey("cash_register_sessions.id"), nullable=True)
+    
     sub_total = Column(Float, default=0.0)
     tax_amount = Column(Float, default=0.0)
     net_total = Column(Float, default=0.0) # Total amount refunded
@@ -84,6 +91,7 @@ class SalesReturn(Base):
     # Relationships
     items = relationship("SaleReturnItem", back_populates="sales_return")
     invoice = relationship("Invoice")
+    cash_register_session = relationship("CashRegisterSession", back_populates="sales_returns")
 
 class SaleReturnItem(Base):
     __tablename__ = "sale_return_items"

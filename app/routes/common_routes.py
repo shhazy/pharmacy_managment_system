@@ -207,6 +207,7 @@ def create_invoice(inv_in: InvoiceCreate, db: Session = Depends(get_db_with_tena
             paid_amount=net_total,
             status=inv_in.status,
             payment_method=inv_in.payment_method,
+            cash_register_session_id=inv_in.cash_register_session_id,
             remarks=inv_in.remarks,
             items=invoice_items
         )
